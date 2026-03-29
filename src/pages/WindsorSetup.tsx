@@ -161,6 +161,18 @@ export default function WindsorSetup() {
         {/* Description */}
         <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
 
+        {/* Illustration */}
+        <div className="rounded-xl overflow-hidden border border-border/40 shadow-sm">
+          <img
+            src={STEP_IMAGES[currentStep]}
+            alt={`Step ${step.number}: ${step.title}`}
+            width={800}
+            height={512}
+            loading="lazy"
+            className="w-full h-auto"
+          />
+        </div>
+
         {/* Tips */}
         <div className="space-y-3">
           {step.tips.map((tip, i) => (
