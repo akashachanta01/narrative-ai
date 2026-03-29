@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BarChart3 } from "lucide-react";
 
@@ -18,8 +19,8 @@ const NavBar = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm">Log in</Button>
-          <Button variant="hero" size="sm" className="rounded-lg">Start Free Trial</Button>
+          <Button variant="ghost" size="sm" asChild><Link to="/auth">Log in</Link></Button>
+          <Button variant="hero" size="sm" className="rounded-lg" asChild><Link to="/auth">Start Free Trial</Link></Button>
         </div>
       </div>
     </nav>
