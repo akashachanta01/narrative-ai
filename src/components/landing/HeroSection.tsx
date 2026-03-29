@@ -5,8 +5,8 @@ import { ArrowRight } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <section className="hero-dark relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.03]" style={{
+    <section className="relative overflow-hidden bg-background">
+      <div className="absolute inset-0 opacity-[0.04]" style={{
         background: "radial-gradient(ellipse at 50% 0%, hsl(230 65% 56%), transparent 70%)"
       }} />
 
@@ -17,18 +17,18 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 text-xs font-sans mb-8" style={{ color: "hsl(var(--hero-muted))" }}>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border text-xs font-sans mb-8 text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-accent" />
             Now in public beta — free to use
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.1] mb-6 font-sans">
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.1] mb-6 font-sans text-foreground">
             Stop guessing.
             <br />
-            <span style={{ color: "hsl(var(--hero-muted))" }}>Start knowing.</span>
+            <span className="text-muted-foreground">Start knowing.</span>
           </h1>
 
-          <p className="text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-10 font-sans" style={{ color: "hsl(var(--hero-muted))" }}>
+          <p className="text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-10 font-sans text-muted-foreground">
             DataBrief connects your marketing and sales tools, then tells you
             what happened, why it happened, and what to do next — in plain English.
           </p>
@@ -40,29 +40,29 @@ const HeroSection = () => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
-            <span className="text-xs" style={{ color: "hsl(var(--hero-muted))" }}>
+            <span className="text-xs text-muted-foreground">
               No credit card required
             </span>
           </div>
         </motion.div>
 
-        {/* Dashboard preview */}
+        {/* Dashboard preview — dark mockup */}
         <motion.div
           className="relative mt-10 sm:mt-14 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          <div className="rounded-xl overflow-hidden border border-white/10 shadow-2xl" style={{ background: "hsl(220 18% 11%)" }}>
+          <div className="rounded-xl overflow-hidden border border-border shadow-2xl" style={{ background: "hsl(220 25% 10%)" }}>
             {/* Browser chrome */}
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: "hsl(220 15% 18%)" }}>
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsl(0 72% 51%)" }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsl(45 90% 55%)" }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: "hsl(140 60% 45%)" }} />
               </div>
               <div className="flex-1 flex justify-center">
-                <div className="px-4 py-1 rounded text-[11px] border border-white/5 font-sans" style={{ color: "hsl(var(--hero-muted))", background: "hsl(220 20% 8%)" }}>
+                <div className="px-4 py-1 rounded text-[11px] border font-sans" style={{ color: "hsl(220 15% 65%)", background: "hsl(220 20% 8%)", borderColor: "hsl(220 15% 18%)" }}>
                   app.databrief.io
                 </div>
               </div>
@@ -75,10 +75,10 @@ const HeroSection = () => {
                   <div className="w-6 h-6 rounded bg-accent/20 flex items-center justify-center">
                     <span className="text-[10px] font-bold text-accent">D</span>
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: "hsl(var(--hero-fg))" }}>My Store</span>
+                  <span className="text-sm font-semibold" style={{ color: "hsl(220 14% 96%)" }}>My Store</span>
                 </div>
                 <div className="flex items-center gap-2 font-sans">
-                  <span className="text-[11px] px-2.5 py-1 rounded border border-white/8" style={{ color: "hsl(var(--hero-muted))" }}>Last 30 days</span>
+                  <span className="text-[11px] px-2.5 py-1 rounded border" style={{ color: "hsl(220 15% 65%)", borderColor: "hsl(220 15% 18%)" }}>Last 30 days</span>
                 </div>
               </div>
 
@@ -89,9 +89,9 @@ const HeroSection = () => {
                   { label: "Conversion", value: "3.2%", change: "+0.4%", up: true },
                   { label: "Bounce Rate", value: "38%", change: "-2.1%", up: true },
                 ].map((m, i) => (
-                  <div key={i} className="p-3 rounded-lg border border-white/5 font-sans" style={{ background: "hsl(220 20% 8%)" }}>
-                    <p className="text-[10px] mb-1" style={{ color: "hsl(var(--hero-muted))" }}>{m.label}</p>
-                    <p className="text-lg font-bold" style={{ color: "hsl(var(--hero-fg))" }}>{m.value}</p>
+                  <div key={i} className="p-3 rounded-lg border font-sans" style={{ background: "hsl(220 20% 8%)", borderColor: "hsl(220 15% 18%)" }}>
+                    <p className="text-[10px] mb-1" style={{ color: "hsl(220 15% 65%)" }}>{m.label}</p>
+                    <p className="text-lg font-bold" style={{ color: "hsl(220 14% 96%)" }}>{m.value}</p>
                     <p className={`text-[10px] font-medium ${m.up ? "text-emerald-400" : "text-red-400"}`}>
                       {m.change}
                     </p>
@@ -99,14 +99,14 @@ const HeroSection = () => {
                 ))}
               </div>
 
-              <div className="rounded-lg border border-white/5 p-4 mb-5" style={{ background: "hsl(220 20% 8%)" }}>
+              <div className="rounded-lg border p-4 mb-5" style={{ background: "hsl(220 20% 8%)", borderColor: "hsl(220 15% 18%)" }}>
                 <div className="flex items-center justify-between mb-3 font-sans">
-                  <span className="text-xs font-medium" style={{ color: "hsl(var(--hero-fg))" }}>Traffic & Revenue</span>
+                  <span className="text-xs font-medium" style={{ color: "hsl(220 14% 96%)" }}>Traffic & Revenue</span>
                   <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-[10px]" style={{ color: "hsl(var(--hero-muted))" }}>
+                    <span className="flex items-center gap-1.5 text-[10px]" style={{ color: "hsl(220 15% 65%)" }}>
                       <span className="w-2 h-2 rounded-full bg-accent" /> Revenue
                     </span>
-                    <span className="flex items-center gap-1.5 text-[10px]" style={{ color: "hsl(var(--hero-muted))" }}>
+                    <span className="flex items-center gap-1.5 text-[10px]" style={{ color: "hsl(220 15% 65%)" }}>
                       <span className="w-2 h-2 rounded-full" style={{ background: "hsl(170 50% 50%)" }} /> Visitors
                     </span>
                   </div>
@@ -134,7 +134,7 @@ const HeroSection = () => {
                 <span className="text-sm mt-0.5">💡</span>
                 <div>
                   <p className="text-[11px] font-semibold text-accent mb-0.5">AI Insight</p>
-                  <p className="text-xs leading-relaxed" style={{ color: "hsl(var(--hero-muted))" }}>
+                  <p className="text-xs leading-relaxed" style={{ color: "hsl(220 15% 65%)" }}>
                     Instagram drove 40% of new visitors this week with 2.3× higher revenue per visitor. Consider increasing spend on that channel.
                   </p>
                 </div>
@@ -150,10 +150,10 @@ const HeroSection = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <p className="text-[11px] uppercase tracking-[0.15em] mb-5" style={{ color: "hsl(var(--hero-muted))" }}>
+          <p className="text-[11px] uppercase tracking-[0.15em] mb-5 text-muted-foreground">
             Works with
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10" style={{ color: "hsl(var(--hero-muted))" }}>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-muted-foreground">
             {["Google Analytics", "Shopify", "Stripe", "Meta Ads", "TikTok", "HubSpot"].map((name) => (
               <span key={name} className="text-sm font-medium opacity-50 hover:opacity-80 transition-opacity cursor-default">
                 {name}
