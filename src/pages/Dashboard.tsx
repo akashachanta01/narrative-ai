@@ -27,9 +27,11 @@ export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [days, setDays] = useState(7);
-  const [darkMode, setDarkMode] = useState(() =>
-    document.documentElement.classList.contains("dark")
-  );
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem("dark-mode");
+    if (saved !== null) return saved === "true";
+    return document.documentElement.classList.contains("dark");
+  });
   const { data: windsorData, isLoading: windsorLoading, refetch } = useWindsorData(days);
 
   const activeRange = DATE_RANGES.find((r) => r.days === days) || DATE_RANGES[0];
@@ -40,6 +42,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("dark-mode", String(darkMode));
   }, [darkMode]);
 
   if (loading) {
