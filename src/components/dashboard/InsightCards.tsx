@@ -91,9 +91,7 @@ function InsightCard({
               <span className="animate-pulse">Generating AI insight…</span>
             </div>
           ) : (
-            <p className="text-sm leading-relaxed text-foreground/70 line-clamp-3">
-              {displayNarrative}
-            </p>
+            <NarrativeWithAction text={displayNarrative} />
           )}
         </div>
 
