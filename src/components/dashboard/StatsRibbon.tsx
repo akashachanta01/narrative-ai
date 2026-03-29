@@ -61,11 +61,11 @@ export function StatsRibbon({ data }: Props) {
   // Filter: only show stats with meaningful (non-zero) data
   // Sessions is always shown; derived stats (conv rate, ROAS, rev/session) require their base to be > 0
   const visibleStats = allStats.filter((s) => {
-    if (s.label === "Sessions") return true; // always show
-    if (s.label === "Conv. rate") return data.totalConversions > 0;
+    if (s.label === "VISITORS") return true;
+    if (s.label === "CONVERSION") return data.totalConversions > 0;
     if (s.label === "ROAS") return data.totalSpend > 0 && data.totalRevenue > 0;
-    if (s.label === "Rev/session") return data.totalRevenue > 0;
-    if (s.label === "Sources" || s.label === "Days tracked") return true; // fallback stats
+    if (s.label === "REV/SESSION") return data.totalRevenue > 0;
+    if (s.label === "SOURCES" || s.label === "DAYS TRACKED") return true;
     return s.rawValue > 0;
   });
 
