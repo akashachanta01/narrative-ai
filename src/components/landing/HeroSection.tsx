@@ -10,7 +10,7 @@ const HeroSection = () => {
         background: "radial-gradient(ellipse at 50% 0%, hsl(230 65% 56%), transparent 70%)"
       }} />
 
-      <div className="container relative z-10 px-6 pt-28 pb-20 sm:pt-36 sm:pb-28 max-w-5xl mx-auto text-center">
+      <div className="container relative z-10 px-6 pt-20 pb-14 sm:pt-24 sm:pb-18 max-w-5xl mx-auto text-center">
         <motion.div
           className="max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ const HeroSection = () => {
 
         {/* Dashboard preview */}
         <motion.div
-          className="relative mt-16 sm:mt-20 max-w-4xl mx-auto"
+          className="relative mt-10 sm:mt-14 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
@@ -145,7 +145,7 @@ const HeroSection = () => {
 
         {/* Integration logos */}
         <motion.div
-          className="mt-16 font-sans"
+          className="mt-10 font-sans"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
