@@ -138,23 +138,66 @@ export default function Connections() {
 
   const integrations = [
     {
-      name: "Windsor.ai",
-      description: "Connect GA4, Shopify, and 100+ marketing sources through Windsor's unified API.",
-      connected: windsorConnected,
-      onConnect: handleConnectWindsor,
-    },
-    {
       name: "Google Analytics 4",
       description: "Pull website traffic, conversions, and audience data directly via OAuth.",
       connected: ga4Connected,
       onConnect: handleConnectGA4,
+      category: "Analytics",
+    },
+    {
+      name: "Windsor.ai",
+      description: "Connect GA4, Shopify, and 100+ marketing sources through Windsor's unified API.",
+      connected: windsorConnected,
+      onConnect: handleConnectWindsor,
+      category: "Aggregator",
     },
     {
       name: "Shopify",
-      description: "Sync orders, revenue, and customer data from your store.",
+      description: "Sync orders, revenue, products, and customer data from your store.",
       connected: false,
       onConnect: () => toast({ title: "Coming soon", description: "Shopify integration is on the roadmap." }),
       comingSoon: true,
+      category: "E-commerce",
+    },
+    {
+      name: "Meta Ads",
+      description: "Import Facebook & Instagram ad spend, impressions, clicks, and ROAS.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Meta Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "Google Ads",
+      description: "Pull campaign performance, spend, conversions, and keyword data.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Google Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "TikTok Ads",
+      description: "Track TikTok ad performance, spend, video views, and conversions.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "TikTok Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "Klaviyo",
+      description: "Email marketing performance — open rates, click rates, and revenue attribution.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Klaviyo integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Email",
+    },
+    {
+      name: "HubSpot",
+      description: "CRM data, deal pipeline, and marketing campaign performance.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "HubSpot integration is on the roadmap." }),
+      comingSoon: true,
+      category: "CRM",
     },
   ];
 
