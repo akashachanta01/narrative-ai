@@ -24,7 +24,19 @@ import {
   Circle,
   AlertCircle,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { LucideIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -169,6 +181,21 @@ export default function Connections() {
     const key = manualKey.trim();
     if (!key) return;
     saveApiKey(key);
+  };
+
+  const handleDisconnect = async (provider: string) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from("user_connections")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("provider", provider);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Disconnected", description: `${provider} has been removed.` });
+      refreshConnections();
+    }
   };
 
   const comingSoonHandler = (name: string) => () =>
@@ -347,6 +374,7 @@ export default function Connections() {
                       manualKey={manualKey}
                       setManualKey={setManualKey}
                       onSaveKey={handleSaveManualKey}
+                      onDisconnect={() => handleDisconnect(integration.provider)}
                       saving={saving}
                     />
                   ))}
