@@ -75,9 +75,10 @@ For each insight card provided, rewrite the narrative following these rules.`;
                       type: "object",
                       properties: {
                         id: { type: "string", description: "The metric name" },
-                        narrative: { type: "string", description: "2-sentence personalized narrative" },
+                        explanation: { type: "string", description: "2-sentence explanation of the trend and its revenue impact" },
+                        action: { type: "string", description: "One specific actionable next step, e.g. 'Increase TikTok budget by 10%'" },
                       },
-                      required: ["id", "narrative"],
+                      required: ["id", "explanation", "action"],
                       additionalProperties: false,
                     },
                   },
