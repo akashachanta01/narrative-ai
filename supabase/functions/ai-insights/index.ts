@@ -36,16 +36,17 @@ serve(async (req) => {
       source: ins.source,
     }));
 
-    const systemPrompt = `You are a sharp, senior marketing analyst. Given analytics insight cards, rewrite each narrative to be:
-- Exactly 2 sentences
-- Conversational and direct (use "you/your")
-- Include a specific, actionable recommendation in the second sentence
-- Sound like a trusted advisor, not a robot
-- Reference the actual numbers provided
+    const systemPrompt = `You are a Senior Digital Marketing Analyst.
 
-Return a JSON array of objects with "id" (the metric name) and "narrative" (your rewritten text). Return ONLY valid JSON, no markdown.`;
+Rules:
+- Identify the single most important trend (e.g., "ROAS is up") or anomaly (e.g., "CPC spiked").
+- Explain it in exactly two plain-English sentences.
+- NO jargon. Focus on revenue impact.
+- End with one actionable next step (e.g., "Increase budget on TikTok by 10%").
 
-    const userPrompt = `Rewrite the narratives for these ${insightSummaries.length} insight cards:\n${JSON.stringify(insightSummaries, null, 2)}`;
+For each insight card provided, rewrite the narrative following these rules. Use "you/your" to address the user directly. Reference the actual numbers.`;
+
+    const userPrompt = `Here are ${insightSummaries.length} insight cards from the user's analytics dashboard. Rewrite each narrative:\n${JSON.stringify(insightSummaries, null, 2)}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
