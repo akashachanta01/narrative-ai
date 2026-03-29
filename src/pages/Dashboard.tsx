@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { InsightCardComponent } from "@/components/dashboard/InsightCard";
 import { EmptyStateConnect } from "@/components/dashboard/EmptyStateConnect";
 import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
-import { mockInsights } from "@/lib/mockInsights";
+import { generateInsights } from "@/lib/generateInsights";
+import type { DynamicInsight } from "@/lib/generateInsights";
 import { LogOut, Settings, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
@@ -27,6 +28,7 @@ export default function Dashboard() {
   }
 
   const hasData = windsorData !== null && windsorData !== undefined;
+  const insights: DynamicInsight[] = hasData ? generateInsights(windsorData) : [];
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -57,10 +59,10 @@ export default function Dashboard() {
           <div className="flex-1 flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : hasData ? (
+        ) : hasData && insights.length > 0 ? (
           <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-3xl mx-auto space-y-5">
-              {mockInsights.map((insight) => (
+              {insights.map((insight) => (
                 <InsightCardComponent key={insight.id} insight={insight} />
               ))}
             </div>
