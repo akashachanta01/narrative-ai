@@ -53,6 +53,20 @@ export default function Connections() {
     setSearchParams({});
   }, [searchParams, user, setSearchParams]);
 
+  // Handle GA4 OAuth callback
+  useEffect(() => {
+    const ga4Connected = searchParams.get("ga4_connected");
+    const ga4Error = searchParams.get("ga4_error");
+    if (ga4Connected === "true") {
+      toast({ title: "Connected!", description: "Google Analytics 4 is now linked to your account." });
+      setSearchParams({});
+      refreshConnections();
+    } else if (ga4Error) {
+      toast({ title: "GA4 connection failed", description: ga4Error, variant: "destructive" });
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
   const saveApiKey = async (apiKey: string) => {
     if (!user) return;
     setSaving(true);
