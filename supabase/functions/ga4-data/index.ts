@@ -126,7 +126,11 @@ serve(async (req) => {
     // Use the first property
     const propertyId = propertySummaries[0].property.replace("properties/", "");
 
-    // Fetch report data for last 7 days
+    // Parse days from query string
+    const url = new URL(req.url);
+    const days = parseInt(url.searchParams.get("days") || "7", 10);
+
+    // Fetch report data
     const reportRes = await fetch(
       `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
       {
@@ -136,7 +140,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+          dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
           dimensions: [{ name: "date" }, { name: "sessionDefaultChannelGroup" }],
           metrics: [
             { name: "sessions" },
