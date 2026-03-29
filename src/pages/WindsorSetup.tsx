@@ -5,6 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import windsorStep1 from "@/assets/windsor-step1.jpg";
+import windsorStep2 from "@/assets/windsor-step2.jpg";
+import windsorStep3 from "@/assets/windsor-step3.jpg";
+import windsorStep4 from "@/assets/windsor-step4.jpg";
 import {
   ArrowLeft,
   ArrowRight,
