@@ -3,39 +3,44 @@ import { supabase } from "@/integrations/supabase/client";
 import type { WindsorDataRow, WindsorSummary } from "@/lib/windsorTypes";
 import { summarizeWindsorData } from "@/lib/windsorTypes";
 
-interface WindsorResult {
-  data: WindsorDataRow[];
-}
-
 export function useWindsorData() {
   return useQuery<WindsorSummary | null>({
-    queryKey: ["windsor-data"],
+    queryKey: ["marketing-data"],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return null;
 
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const res = await fetch(
+      const headers = {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      };
+
+      // Try Windsor first
+      const windsorRes = await fetch(
         `https://${projectId}.supabase.co/functions/v1/windsor-data`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers }
       );
+      const windsorJson = await windsorRes.json();
 
-      const json = await res.json();
-
-      if (json.error === "no_connection" || !json.data || json.data.length === 0) {
-        return null;
+      if (windsorJson.data && windsorJson.data.length > 0) {
+        return summarizeWindsorData(windsorJson.data as WindsorDataRow[]);
       }
 
-      if (json.error) throw new Error(json.message || json.error);
+      // Try GA4
+      const ga4Res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/ga4-data`,
+        { headers }
+      );
+      const ga4Json = await ga4Res.json();
 
-      return summarizeWindsorData(json.data as WindsorDataRow[]);
+      if (ga4Json.data && ga4Json.data.length > 0) {
+        return summarizeWindsorData(ga4Json.data as WindsorDataRow[]);
+      }
+
+      return null;
     },
-    staleTime: 5 * 60 * 1000, // 5 min
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 }

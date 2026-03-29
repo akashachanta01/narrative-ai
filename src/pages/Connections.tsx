@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { ExternalLink, CheckCircle2, Loader2, LogOut, KeyRound, ArrowLeft } from "lucide-react";
 
 const WINDSOR_OAUTH_URL = "https://onboard.windsor.ai/";
+const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 
 interface Connection {
   id: string;
@@ -52,6 +53,20 @@ export default function Connections() {
     setSearchParams({});
   }, [searchParams, user, setSearchParams]);
 
+  // Handle GA4 OAuth callback
+  useEffect(() => {
+    const ga4Connected = searchParams.get("ga4_connected");
+    const ga4Error = searchParams.get("ga4_error");
+    if (ga4Connected === "true") {
+      toast({ title: "Connected!", description: "Google Analytics 4 is now linked to your account." });
+      setSearchParams({});
+      refreshConnections();
+    } else if (ga4Error) {
+      toast({ title: "GA4 connection failed", description: ga4Error, variant: "destructive" });
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
   const saveApiKey = async (apiKey: string) => {
     if (!user) return;
     setSaving(true);
@@ -73,13 +88,38 @@ export default function Connections() {
   };
 
   const windsorConnected = connections.some((c) => c.provider === "windsor");
+  const ga4Connected = connections.some((c) => c.provider === "ga4");
 
   const handleConnectWindsor = () => {
-    // Open Windsor in a new tab to avoid iframe issues
     const redirectUrl = `${window.location.origin}/connections`;
     window.open(`${WINDSOR_OAUTH_URL}?redirect_uri=${encodeURIComponent(redirectUrl)}`, "_blank");
-    // Show manual key input as fallback
     setShowKeyInput(true);
+  };
+
+  const handleConnectGA4 = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch(
+        `https://${PROJECT_ID}.supabase.co/functions/v1/ga4-auth`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ redirect_uri: `${window.location.origin}/connections` }),
+        }
+      );
+      const json = await res.json();
+      if (json.url) {
+        window.location.href = json.url;
+      } else {
+        toast({ title: "Error", description: json.error || "Failed to start GA4 auth", variant: "destructive" });
+      }
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to connect to GA4", variant: "destructive" });
+    }
   };
 
   const handleSaveManualKey = () => {
@@ -105,10 +145,9 @@ export default function Connections() {
     },
     {
       name: "Google Analytics 4",
-      description: "Pull website traffic, conversions, and audience data directly.",
-      connected: false,
-      onConnect: () => toast({ title: "Coming soon", description: "GA4 direct integration is on the roadmap." }),
-      comingSoon: true,
+      description: "Pull website traffic, conversions, and audience data directly via OAuth.",
+      connected: ga4Connected,
+      onConnect: handleConnectGA4,
     },
     {
       name: "Shopify",
