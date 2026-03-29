@@ -138,23 +138,66 @@ export default function Connections() {
 
   const integrations = [
     {
-      name: "Windsor.ai",
-      description: "Connect GA4, Shopify, and 100+ marketing sources through Windsor's unified API.",
-      connected: windsorConnected,
-      onConnect: handleConnectWindsor,
-    },
-    {
       name: "Google Analytics 4",
       description: "Pull website traffic, conversions, and audience data directly via OAuth.",
       connected: ga4Connected,
       onConnect: handleConnectGA4,
+      category: "Analytics",
+    },
+    {
+      name: "Windsor.ai",
+      description: "Connect GA4, Shopify, and 100+ marketing sources through Windsor's unified API.",
+      connected: windsorConnected,
+      onConnect: handleConnectWindsor,
+      category: "Aggregator",
     },
     {
       name: "Shopify",
-      description: "Sync orders, revenue, and customer data from your store.",
+      description: "Sync orders, revenue, products, and customer data from your store.",
       connected: false,
       onConnect: () => toast({ title: "Coming soon", description: "Shopify integration is on the roadmap." }),
       comingSoon: true,
+      category: "E-commerce",
+    },
+    {
+      name: "Meta Ads",
+      description: "Import Facebook & Instagram ad spend, impressions, clicks, and ROAS.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Meta Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "Google Ads",
+      description: "Pull campaign performance, spend, conversions, and keyword data.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Google Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "TikTok Ads",
+      description: "Track TikTok ad performance, spend, video views, and conversions.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "TikTok Ads integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Paid Ads",
+    },
+    {
+      name: "Klaviyo",
+      description: "Email marketing performance — open rates, click rates, and revenue attribution.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "Klaviyo integration is on the roadmap." }),
+      comingSoon: true,
+      category: "Email",
+    },
+    {
+      name: "HubSpot",
+      description: "CRM data, deal pipeline, and marketing campaign performance.",
+      connected: false,
+      onConnect: () => toast({ title: "Coming soon", description: "HubSpot integration is on the roadmap." }),
+      comingSoon: true,
+      category: "CRM",
     },
   ];
 
@@ -189,81 +232,90 @@ export default function Connections() {
           </div>
         )}
 
-        <div className="space-y-4">
-          {integrations.map((integration) => (
-            <div key={integration.name} className="glass-card p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground">{integration.name}</h3>
-                    {integration.comingSoon && (
-                      <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                        Coming soon
-                      </span>
+        {/* Group by category */}
+        {(() => {
+          const categories = [...new Set(integrations.map((i) => i.category))];
+          return categories.map((cat) => (
+            <div key={cat} className="space-y-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em] px-1">{cat}</h3>
+              {integrations
+                .filter((i) => i.category === cat)
+                .map((integration) => (
+                  <div key={integration.name} className="glass-card p-6 space-y-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{integration.name}</h3>
+                          {integration.comingSoon && (
+                            <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium">
+                              Coming soon
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{integration.description}</p>
+                      </div>
+
+                      {integration.connected ? (
+                        <div className="flex items-center gap-2 text-primary shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                          <span className="text-sm font-medium">Connected</span>
+                        </div>
+                      ) : (
+                        <Button
+                          variant={integration.comingSoon ? "outline" : "hero"}
+                          size="sm"
+                          onClick={integration.onConnect}
+                          disabled={integration.comingSoon}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Connect
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Manual API key input for Windsor */}
+                    {integration.name === "Windsor.ai" && showKeyInput && !windsorConnected && (
+                      <div className="border-t border-border pt-4 space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                          Windsor.ai opened in a new tab. After completing setup, paste your API key below:
+                        </p>
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              value={manualKey}
+                              onChange={(e) => setManualKey(e.target.value)}
+                              placeholder="Paste your Windsor.ai API key"
+                              className="pl-10"
+                            />
+                          </div>
+                          <Button
+                            variant="hero"
+                            onClick={handleSaveManualKey}
+                            disabled={!manualKey.trim() || saving}
+                          >
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Find your API key at{" "}
+                          <a
+                            href="https://onboard.windsor.ai/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline underline-offset-2"
+                          >
+                            onboard.windsor.ai
+                          </a>
+                          {" "}→ Account Settings → API Keys.
+                        </p>
+                      </div>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{integration.description}</p>
-                </div>
-
-                {integration.connected ? (
-                  <div className="flex items-center gap-2 text-primary shrink-0">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="text-sm font-medium">Connected</span>
-                  </div>
-                ) : (
-                  <Button
-                    variant={integration.comingSoon ? "outline" : "hero"}
-                    size="sm"
-                    onClick={integration.onConnect}
-                    disabled={integration.comingSoon}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    Connect
-                  </Button>
-                )}
-              </div>
-
-              {/* Manual API key input for Windsor */}
-              {integration.name === "Windsor.ai" && showKeyInput && !windsorConnected && (
-                <div className="border-t border-border pt-4 space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Windsor.ai opened in a new tab. After completing setup, paste your API key below:
-                  </p>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        value={manualKey}
-                        onChange={(e) => setManualKey(e.target.value)}
-                        placeholder="Paste your Windsor.ai API key"
-                        className="pl-10"
-                      />
-                    </div>
-                    <Button
-                      variant="hero"
-                      onClick={handleSaveManualKey}
-                      disabled={!manualKey.trim() || saving}
-                    >
-                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Find your API key at{" "}
-                    <a
-                      href="https://onboard.windsor.ai/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline underline-offset-2"
-                    >
-                      onboard.windsor.ai
-                    </a>
-                    {" "}→ Account Settings → API Keys.
-                  </p>
-                </div>
-              )}
+                ))}
             </div>
-          ))}
-        </div>
+          ));
+        })()}
       </main>
     </div>
   );
