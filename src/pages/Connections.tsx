@@ -271,49 +271,51 @@ export default function Connections() {
                           Connect
                         </Button>
                       )}
-              </div>
-
-              {/* Manual API key input for Windsor */}
-              {integration.name === "Windsor.ai" && showKeyInput && !windsorConnected && (
-                <div className="border-t border-border pt-4 space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Windsor.ai opened in a new tab. After completing setup, paste your API key below:
-                  </p>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        value={manualKey}
-                        onChange={(e) => setManualKey(e.target.value)}
-                        placeholder="Paste your Windsor.ai API key"
-                        className="pl-10"
-                      />
                     </div>
-                    <Button
-                      variant="hero"
-                      onClick={handleSaveManualKey}
-                      disabled={!manualKey.trim() || saving}
-                    >
-                      {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
-                    </Button>
+
+                    {/* Manual API key input for Windsor */}
+                    {integration.name === "Windsor.ai" && showKeyInput && !windsorConnected && (
+                      <div className="border-t border-border pt-4 space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                          Windsor.ai opened in a new tab. After completing setup, paste your API key below:
+                        </p>
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              value={manualKey}
+                              onChange={(e) => setManualKey(e.target.value)}
+                              placeholder="Paste your Windsor.ai API key"
+                              className="pl-10"
+                            />
+                          </div>
+                          <Button
+                            variant="hero"
+                            onClick={handleSaveManualKey}
+                            disabled={!manualKey.trim() || saving}
+                          >
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Find your API key at{" "}
+                          <a
+                            href="https://onboard.windsor.ai/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline underline-offset-2"
+                          >
+                            onboard.windsor.ai
+                          </a>
+                          {" "}→ Account Settings → API Keys.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Find your API key at{" "}
-                    <a
-                      href="https://onboard.windsor.ai/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline underline-offset-2"
-                    >
-                      onboard.windsor.ai
-                    </a>
-                    {" "}→ Account Settings → API Keys.
-                  </p>
-                </div>
-              )}
+                ))}
             </div>
-          ))}
-        </div>
+          ));
+        })()}
       </main>
     </div>
   );
