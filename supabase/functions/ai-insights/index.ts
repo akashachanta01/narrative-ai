@@ -120,8 +120,13 @@ For each insight card provided, rewrite the narrative following these rules.`;
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
+      // Merge explanation + action into a single narrative with → separator
+      const narratives = (parsed.narratives || []).map((n: any) => ({
+        id: n.id,
+        narrative: n.action ? `${n.explanation} → ${n.action}` : n.explanation || n.narrative || "",
+      }));
       return new Response(
-        JSON.stringify(parsed),
+        JSON.stringify({ narratives }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
