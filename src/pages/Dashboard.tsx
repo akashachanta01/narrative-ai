@@ -4,13 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWindsorData } from "@/hooks/useWindsorData";
 import { Button } from "@/components/ui/button";
 import { EmptyStateConnect } from "@/components/dashboard/EmptyStateConnect";
-import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
 import { StatsRibbon } from "@/components/dashboard/StatsRibbon";
 import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
 import { InsightCards } from "@/components/dashboard/InsightCards";
-import { WeeklySummary } from "@/components/dashboard/WeeklySummary";
-import { LogOut, Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
+import { Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -29,6 +27,9 @@ export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [days, setDays] = useState(7);
+  const [darkMode, setDarkMode] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
   const { data: windsorData, isLoading: windsorLoading, refetch } = useWindsorData(days);
 
   const activeRange = DATE_RANGES.find((r) => r.days === days) || DATE_RANGES[0];
@@ -36,6 +37,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   if (loading) {
     return (
@@ -87,6 +92,16 @@ export default function Dashboard() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Dark mode toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
+              onClick={() => setDarkMode(!darkMode)}
+            >
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -121,10 +136,7 @@ export default function Dashboard() {
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <StatsRibbon data={windsorData} />
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.08 }} className="px-4 sm:px-6 pb-4">
-              <WeeklySummary data={windsorData} />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.14 }} className="px-4 sm:px-6 pb-4">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="px-4 sm:px-6 pb-4">
               <InsightCards data={windsorData} />
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }} className="px-4 sm:px-6 pb-4">
@@ -138,8 +150,6 @@ export default function Dashboard() {
           <EmptyStateConnect />
         )}
       </div>
-
-      <ChatSidebar />
     </div>
   );
 }
