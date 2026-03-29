@@ -5,6 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import windsorStep1 from "@/assets/windsor-step1.jpg";
+import windsorStep2 from "@/assets/windsor-step2.jpg";
+import windsorStep3 from "@/assets/windsor-step3.jpg";
+import windsorStep4 from "@/assets/windsor-step4.jpg";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +20,8 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+
+const STEP_IMAGES = [windsorStep1, windsorStep2, windsorStep3, windsorStep4];
 
 const STEPS = [
   {
@@ -154,6 +160,18 @@ export default function WindsorSetup() {
 
         {/* Description */}
         <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+
+        {/* Illustration */}
+        <div className="rounded-xl overflow-hidden border border-border/40 shadow-sm">
+          <img
+            src={STEP_IMAGES[currentStep]}
+            alt={`Step ${step.number}: ${step.title}`}
+            width={800}
+            height={512}
+            loading="lazy"
+            className="w-full h-auto"
+          />
+        </div>
 
         {/* Tips */}
         <div className="space-y-3">
