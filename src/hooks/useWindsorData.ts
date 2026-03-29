@@ -6,6 +6,8 @@ import { summarizeWindsorData } from "@/lib/windsorTypes";
 export function useWindsorData(days: number = 7) {
   return useQuery<WindsorSummary | null>({
     queryKey: ["marketing-data", days],
+    refetchOnMount: false,
+    queryKey: ["marketing-data", days],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return null;
