@@ -8,9 +8,10 @@ interface Props {
 interface StatItem {
   label: string;
   value: string;
+  suffix: string;
   rawValue: number;
   change: number | null;
-  priority: number; // lower = more important
+  priority: number;
 }
 
 export function StatsRibbon({ data }: Props) {
@@ -46,26 +47,15 @@ export function StatsRibbon({ data }: Props) {
 
   // Build all possible stats with priorities
   const allStats: StatItem[] = [
-    // Sessions — always important, always shown first
-    { label: "Sessions", value: data.totalSessions.toLocaleString(), rawValue: data.totalSessions, change: pctChange("sessions"), priority: 0 },
-    // Revenue — high priority if available
-    { label: "Revenue", value: `$${data.totalRevenue.toLocaleString()}`, rawValue: data.totalRevenue, change: pctChange("revenue"), priority: 1 },
-    // Conversions — show if non-zero
-    { label: "Conversions", value: data.totalConversions.toLocaleString(), rawValue: data.totalConversions, change: pctChange("conversions"), priority: 2 },
-    // Conv rate — only meaningful with conversions
-    { label: "Conv. rate", value: `${convRate.toFixed(2)}%`, rawValue: convRate, change: null, priority: 3 },
-    // Clicks
-    { label: "Clicks", value: data.totalClicks.toLocaleString(), rawValue: data.totalClicks, change: pctChange("clicks"), priority: 4 },
-    // Spend
-    { label: "Spend", value: `$${data.totalSpend.toLocaleString()}`, rawValue: data.totalSpend, change: pctChange("spend"), priority: 5 },
-    // ROAS — only if spend > 0
-    { label: "ROAS", value: `${data.roas.toFixed(1)}x`, rawValue: data.roas, change: null, priority: 6 },
-    // Rev/session — only if revenue > 0
-    { label: "Rev/session", value: `$${revenuePerSession.toFixed(2)}`, rawValue: revenuePerSession, change: null, priority: 7 },
-    // Sources count — always available as a fallback
-    { label: "Sources", value: uniqueSources.toString(), rawValue: uniqueSources, change: null, priority: 8 },
-    // Days tracked
-    { label: "Days tracked", value: dates.length.toString(), rawValue: dates.length, change: null, priority: 9 },
+    { label: "VISITORS", value: data.totalSessions.toLocaleString(), suffix: "UV", rawValue: data.totalSessions, change: pctChange("sessions"), priority: 0 },
+    { label: "REVENUE", value: `$${data.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, suffix: "", rawValue: data.totalRevenue, change: pctChange("revenue"), priority: 1 },
+    { label: "CONVERSION", value: `${convRate.toFixed(2)}%`, suffix: "AVG", rawValue: convRate, change: pctChange("conversions"), priority: 2 },
+    { label: "CLICKS", value: data.totalClicks.toLocaleString(), suffix: "", rawValue: data.totalClicks, change: pctChange("clicks"), priority: 4 },
+    { label: "SPEND", value: `$${data.totalSpend.toLocaleString()}`, suffix: "", rawValue: data.totalSpend, change: pctChange("spend"), priority: 5 },
+    { label: "ROAS", value: `${data.roas.toFixed(1)}x`, suffix: "", rawValue: data.roas, change: null, priority: 6 },
+    { label: "REV/SESSION", value: `$${revenuePerSession.toFixed(2)}`, suffix: "", rawValue: revenuePerSession, change: null, priority: 7 },
+    { label: "SOURCES", value: uniqueSources.toString(), suffix: "", rawValue: uniqueSources, change: null, priority: 8 },
+    { label: "DAYS TRACKED", value: dates.length.toString(), suffix: "", rawValue: dates.length, change: null, priority: 9 },
   ];
 
   // Filter: only show stats with meaningful (non-zero) data
@@ -84,23 +74,30 @@ export function StatsRibbon({ data }: Props) {
 
   return (
     <div className="px-4 sm:px-6 py-4 overflow-x-auto">
-      <div className="flex gap-6 sm:gap-8 min-w-max">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-flow-col lg:auto-cols-fr gap-3 sm:gap-4 min-w-0">
         {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col gap-0.5">
-            <span className="text-[11px] text-muted-foreground font-medium">{stat.label}</span>
-            <span className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
-              {stat.value}
-            </span>
-            {stat.change !== null && (
-              <span
-                className={`text-[11px] font-medium flex items-center gap-0.5 ${
-                  stat.change > 0 ? "text-green-500" : stat.change < 0 ? "text-red-400" : "text-muted-foreground"
-                }`}
-              >
-                {stat.change > 0 ? <TrendingUp className="w-3 h-3" /> : stat.change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
-                {stat.change > 0 ? "+" : ""}{stat.change}%
+          <div key={stat.label} className="rounded-xl border border-border/60 bg-card px-5 py-4 flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground font-semibold tracking-[0.12em] uppercase">{stat.label}</span>
+              {stat.change !== null && (
+                <span
+                  className={`text-[11px] font-medium flex items-center gap-0.5 ${
+                    stat.change > 0 ? "text-green-500" : stat.change < 0 ? "text-red-400" : "text-muted-foreground"
+                  }`}
+                >
+                  {stat.change > 0 ? <TrendingUp className="w-3 h-3" /> : stat.change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                  {stat.change > 0 ? "+" : ""}{stat.change}%
+                </span>
+              )}
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight leading-tight">
+                {stat.value}
               </span>
-            )}
+              {stat.suffix && (
+                <span className="text-xs text-muted-foreground font-medium tracking-wide">{stat.suffix}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>
