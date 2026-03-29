@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, MessageSquare, X, Sparkles } from "lucide-react";
+import { Send, Loader2, X, Sparkles } from "lucide-react";
 import { streamChat } from "@/lib/streamChat";
 import { toast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -20,6 +22,12 @@ export function ChatSidebar() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  // On mobile, default to closed
+  useEffect(() => {
+    if (isMobile) setIsOpen(false);
+  }, [isMobile]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -62,23 +70,10 @@ export function ChatSidebar() {
     }
   };
 
-  if (!isOpen) {
-    return (
-      <motion.button
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center hover:scale-105 transition-transform"
-      >
-        <Sparkles className="w-5 h-5" />
-      </motion.button>
-    );
-  }
-
-  return (
-    <aside className="w-[380px] shrink-0 border-l border-border bg-card/50 backdrop-blur-sm flex flex-col h-screen">
+  const chatContent = (
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
+      <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
@@ -88,9 +83,11 @@ export function ChatSidebar() {
             <p className="text-[11px] text-muted-foreground">Ask anything about your data</p>
           </div>
         </div>
-        <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted">
-          <X className="w-4 h-4" />
-        </button>
+        {!isMobile && (
+          <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted">
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Messages */}
@@ -113,7 +110,6 @@ export function ChatSidebar() {
               </div>
             </div>
 
-            {/* Quick prompts */}
             <div className="space-y-2">
               <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-1">Try asking</p>
               {quickPrompts.map((prompt) => (
@@ -158,11 +154,7 @@ export function ChatSidebar() {
         </AnimatePresence>
 
         {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-start"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
             <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
               <span className="text-xs text-muted-foreground">Thinking…</span>
@@ -172,12 +164,9 @@ export function ChatSidebar() {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-4 border-t border-border/60">
+      <div className="px-4 py-4 border-t border-border/60 shrink-0">
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send();
-          }}
+          onSubmit={(e) => { e.preventDefault(); send(); }}
           className="flex gap-2 items-center bg-background rounded-xl border border-border/60 px-3 py-1 focus-within:border-primary/40 transition-colors"
         >
           <input
@@ -187,16 +176,46 @@ export function ChatSidebar() {
             className="flex-1 text-sm bg-transparent py-2.5 outline-none placeholder:text-muted-foreground/60 text-foreground"
             disabled={isLoading}
           />
-          <Button
-            type="submit"
-            size="icon"
-            className="h-8 w-8 rounded-lg shrink-0"
-            disabled={isLoading || !input.trim()}
-          >
+          <Button type="submit" size="icon" className="h-8 w-8 rounded-lg shrink-0" disabled={isLoading || !input.trim()}>
             <Send className="w-3.5 h-3.5" />
           </Button>
         </form>
       </div>
+    </div>
+  );
+
+  // FAB button (shown when closed)
+  const fab = !isOpen ? (
+    <motion.button
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      onClick={() => setIsOpen(true)}
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center hover:scale-105 transition-transform"
+    >
+      <Sparkles className="w-5 h-5" />
+    </motion.button>
+  ) : null;
+
+  // Mobile: use Sheet overlay
+  if (isMobile) {
+    return (
+      <>
+        {fab}
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetContent side="right" className="w-full sm:w-[380px] p-0 flex flex-col">
+            {chatContent}
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop: inline sidebar or FAB
+  if (!isOpen) return fab;
+
+  return (
+    <aside className="w-[380px] shrink-0 border-l border-border bg-card/50 backdrop-blur-sm flex flex-col h-screen">
+      {chatContent}
     </aside>
   );
 }
