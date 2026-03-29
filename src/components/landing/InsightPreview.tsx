@@ -20,10 +20,10 @@ const steps = [
 
 const InsightPreview = () => {
   return (
-    <section className="py-24 sm:py-28">
+    <section className="py-14 sm:py-18">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="mb-16 max-w-xl mx-auto text-center"
+          className="mb-10 max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
