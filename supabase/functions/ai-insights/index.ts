@@ -75,9 +75,10 @@ For each insight card provided, rewrite the narrative following these rules.`;
                       type: "object",
                       properties: {
                         id: { type: "string", description: "The metric name" },
-                        narrative: { type: "string", description: "2-sentence personalized narrative" },
+                        explanation: { type: "string", description: "2-sentence explanation of the trend and its revenue impact" },
+                        action: { type: "string", description: "One specific actionable next step, e.g. 'Increase TikTok budget by 10%'" },
                       },
-                      required: ["id", "narrative"],
+                      required: ["id", "explanation", "action"],
                       additionalProperties: false,
                     },
                   },
@@ -119,8 +120,13 @@ For each insight card provided, rewrite the narrative following these rules.`;
     const toolCall = result.choices?.[0]?.message?.tool_calls?.[0];
     if (toolCall?.function?.arguments) {
       const parsed = JSON.parse(toolCall.function.arguments);
+      // Merge explanation + action into a single narrative with → separator
+      const narratives = (parsed.narratives || []).map((n: any) => ({
+        id: n.id,
+        narrative: n.action ? `${n.explanation} → ${n.action}` : n.explanation || n.narrative || "",
+      }));
       return new Response(
-        JSON.stringify(parsed),
+        JSON.stringify({ narratives }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
