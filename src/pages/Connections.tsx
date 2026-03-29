@@ -51,6 +51,12 @@ interface Connection {
   updated_at: string;
 }
 
+interface HealthResult {
+  healthy: boolean;
+  reason: string;
+  provider: string;
+}
+
 type ConnectionStatus = "connected" | "error" | "syncing" | "disconnected" | "coming_soon";
 
 interface Integration {
@@ -74,6 +80,8 @@ export default function Connections() {
   const [saving, setSaving] = useState(false);
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [manualKey, setManualKey] = useState("");
+  const [healthResults, setHealthResults] = useState<Record<string, HealthResult>>({});
+  const [checkingHealth, setCheckingHealth] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -197,6 +205,44 @@ export default function Connections() {
       refreshConnections();
     }
   };
+
+  const handleHealthCheck = async (provider: string) => {
+    setCheckingHealth((prev) => ({ ...prev, [provider]: true }));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch(
+        `https://${PROJECT_ID}.supabase.co/functions/v1/health-check`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ provider }),
+        }
+      );
+      const result = await res.json();
+      setHealthResults((prev) => ({ ...prev, [provider]: result }));
+      refreshConnections();
+      toast({
+        title: result.healthy ? "Connection healthy" : "Connection issue",
+        description: result.reason,
+        variant: result.healthy ? "default" : "destructive",
+      });
+    } catch {
+      toast({ title: "Error", description: "Health check failed", variant: "destructive" });
+    } finally {
+      setCheckingHealth((prev) => ({ ...prev, [provider]: false }));
+    }
+  };
+
+  // Auto health-check connected integrations on mount
+  useEffect(() => {
+    if (!user || connections.length === 0) return;
+    const activeProviders = connections.filter((c) => c.status === "active").map((c) => c.provider);
+    activeProviders.forEach((provider) => handleHealthCheck(provider));
+  }, [connections.length, user]);
 
   const comingSoonHandler = (name: string) => () =>
     toast({ title: "Coming soon", description: `${name} integration is on the roadmap.` });
@@ -375,6 +421,9 @@ export default function Connections() {
                       setManualKey={setManualKey}
                       onSaveKey={handleSaveManualKey}
                       onDisconnect={() => handleDisconnect(integration.provider)}
+                      onHealthCheck={() => handleHealthCheck(integration.provider)}
+                      checkingHealth={!!checkingHealth[integration.provider]}
+                      healthResult={healthResults[integration.provider]}
                       saving={saving}
                     />
                   ))}
@@ -510,6 +559,20 @@ function IntegrationCard({
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
+                onClick={onHealthCheck}
+                disabled={checkingHealth}
+              >
+                {checkingHealth ? (
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                ) : (
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                )}
+                Test
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
                 onClick={integration.onConnect}
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
@@ -547,6 +610,22 @@ function IntegrationCard({
           )}
         </div>
       </div>
+
+      {/* Health check result */}
+      {isActive && healthResult && (
+        <div className={`border-t pt-3 flex items-center gap-2 text-xs ${
+          healthResult.healthy
+            ? "border-green-500/20 text-green-600 dark:text-green-400"
+            : "border-red-500/20 text-red-600 dark:text-red-400"
+        }`}>
+          {healthResult.healthy ? (
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+          ) : (
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          )}
+          <span>{healthResult.reason}</span>
+        </div>
+      )}
 
       {/* Windsor manual key input */}
       {showKeyInput && (
