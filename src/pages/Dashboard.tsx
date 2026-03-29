@@ -99,8 +99,9 @@ export default function Dashboard() {
               size="sm"
               className="h-9 px-4 text-xs font-semibold tracking-wider uppercase"
               onClick={() => refetch?.()}
+              disabled={windsorLoading}
             >
-              Refresh
+              {windsorLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Refresh"}
             </Button>
           </div>
         </header>
