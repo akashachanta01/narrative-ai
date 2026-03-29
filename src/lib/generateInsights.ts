@@ -12,6 +12,7 @@ export interface DynamicInsight {
   changeType: "up" | "down" | "neutral";
   narrative: string;
   source: string;
+  sparkline: number[];
 }
 
 export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
@@ -35,6 +36,9 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
     ? Math.round(((secondSessions - firstSessions) / firstSessions) * 100)
     : 0;
 
+  // Daily sparkline data
+  const dailySessions = dates.map((d) => byDate[d]);
+
   // 1. Total Sessions insight
   insights.push({
     id: "sessions",
@@ -52,9 +56,10 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
           : "Traffic has been steady throughout the week."
     }`,
     source: "Google Analytics",
+    sparkline: dailySessions,
   });
 
-  // 2. Top Source insight
+  // 2. Top Source insight — sparkline: daily sessions for top source
   const bySource: Record<string, number> = {};
   for (const r of rows) {
     bySource[r.source] = (bySource[r.source] || 0) + (r.sessions || 0);
@@ -64,6 +69,10 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
   const topSourcePct = summary.totalSessions > 0
     ? Math.round((topSource[1] / summary.totalSessions) * 100)
     : 0;
+
+  const topSourceDaily = dates.map((d) =>
+    rows.filter((r) => r.date === d && r.source === topSource[0]).reduce((s, r) => s + (r.sessions || 0), 0)
+  );
 
   insights.push({
     id: "top-source",
@@ -83,6 +92,7 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
         : ""
     }`,
     source: "Google Analytics",
+    sparkline: topSourceDaily,
   });
 
   // 3. Source diversity / emerging source
@@ -91,6 +101,9 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
       name.includes("chatgpt") || name.includes("bing") || name.includes("social")
     );
     if (emerging) {
+      const emergingDaily = dates.map((d) =>
+        rows.filter((r) => r.date === d && r.source === emerging[0]).reduce((s, r) => s + (r.sessions || 0), 0)
+      );
       insights.push({
         id: "emerging",
         icon: Zap,
@@ -101,6 +114,7 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
         changeType: "up",
         narrative: `"${formatSourceName(emerging[0])}" is an emerging traffic source with ${emerging[1]} sessions this week. AI-driven search and alternative engines are becoming meaningful referrers — make sure your content is optimized for these platforms.`,
         source: "Google Analytics",
+        sparkline: emergingDaily,
       });
     }
   }
@@ -120,6 +134,7 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
     changeType: "up",
     narrative: `Your busiest day was ${new Date(peakDay).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} with ${peakSessions} sessions — ${Math.round((peakSessions / avgDaily - 1) * 100)}% above your daily average of ${avgDaily}. Consider scheduling your most important content or promotions on this day of the week.`,
     source: "Google Analytics",
+    sparkline: dailySessions,
   });
 
   return insights;
