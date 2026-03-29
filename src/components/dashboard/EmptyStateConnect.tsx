@@ -17,7 +17,7 @@ export function EmptyStateConnect() {
             Link your marketing platforms through Windsor.ai to unlock powerful insights about your business.
           </p>
         </div>
-        <Button variant="hero" size="lg" onClick={() => navigate("/connections")}>
+        <Button size="lg" onClick={() => navigate("/connections")}>
           <PlugZap className="w-5 h-5 mr-2" />
           Go to Connection Hub
         </Button>

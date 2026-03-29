@@ -134,7 +134,7 @@ export default function Auth() {
               minLength={6}
             />
           </div>
-          <Button type="submit" variant="hero" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Loading…" : isLogin ? "Sign In" : "Sign Up"}
           </Button>
         </form>
