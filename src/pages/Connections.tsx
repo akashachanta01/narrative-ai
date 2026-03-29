@@ -445,6 +445,7 @@ function IntegrationCard({
   manualKey,
   setManualKey,
   onSaveKey,
+  onDisconnect,
   saving,
 }: {
   integration: Integration;
@@ -452,6 +453,7 @@ function IntegrationCard({
   manualKey: string;
   setManualKey: (v: string) => void;
   onSaveKey: () => void;
+  onDisconnect: () => void;
   saving: boolean;
 }) {
   const Icon = integration.icon;
@@ -469,7 +471,6 @@ function IntegrationCard({
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        {/* Left: icon + info */}
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
             isActive ? "bg-green-500/10" : "bg-accent/80"
@@ -479,7 +480,6 @@ function IntegrationCard({
           <div className="min-w-0 space-y-1">
             <h4 className="text-sm font-semibold text-foreground truncate">{integration.name}</h4>
             <p className="text-xs text-muted-foreground leading-relaxed">{integration.description}</p>
-            {/* Last sync timestamp */}
             {integration.lastSync && isActive && (
               <div className="flex items-center gap-1 pt-0.5">
                 <Clock className="w-3 h-3 text-muted-foreground/60" />
@@ -491,7 +491,6 @@ function IntegrationCard({
           </div>
         </div>
 
-        {/* Right: status + action */}
         <div className="flex flex-col items-end gap-2 shrink-0">
           <StatusBadge status={integration.status} />
           {!isActive && !isComingSoon && (
@@ -506,15 +505,45 @@ function IntegrationCard({
             </Button>
           )}
           {isActive && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
-              onClick={integration.onConnect}
-            >
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Reconnect
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
+                onClick={integration.onConnect}
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Reconnect
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-[11px] text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Disconnect {integration.name}?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will remove the connection and stop syncing data from {integration.name}. You can reconnect at any time.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={onDisconnect}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Disconnect
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           )}
         </div>
       </div>
