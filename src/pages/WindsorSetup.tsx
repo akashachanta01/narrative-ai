@@ -21,6 +21,8 @@ import {
   Check,
 } from "lucide-react";
 
+const STEP_IMAGES = [windsorStep1, windsorStep2, windsorStep3, windsorStep4];
+
 const STEPS = [
   {
     number: 1,
