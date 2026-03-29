@@ -8,7 +8,7 @@ import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
 import { StatsRibbon } from "@/components/dashboard/StatsRibbon";
 import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
-import { LogOut, Settings, Loader2, Sparkles, RefreshCw, Sun, Moon, ChevronDown } from "lucide-react";
+import { LogOut, Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -55,60 +55,60 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 border-b border-border/50">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-              </div>
-              <span className="text-sm font-semibold text-foreground tracking-tight">Narrative</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-
-            {/* Date range dropdown */}
-            <div className="flex items-center gap-1.5 ml-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 px-3">
-                    {activeRange.label}
-                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  {DATE_RANGES.map((range) => (
-                    <DropdownMenuItem
-                      key={range.days}
-                      onClick={() => setDays(range.days)}
-                      className={days === range.days ? "bg-accent" : ""}
-                    >
-                      {range.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded px-2 py-0.5">Daily</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => refetch?.()}
-              >
-                <RefreshCw className="w-3 h-3" />
-              </Button>
-            </div>
+            <span className="text-sm font-semibold text-foreground tracking-tight">Narrative</span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            {/* Date range pill */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 text-xs gap-2 px-4 font-mono tracking-wide">
+                  <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
+                  {activeRange.label}
+                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {DATE_RANGES.map((range) => (
+                  <DropdownMenuItem
+                    key={range.days}
+                    onClick={() => setDays(range.days)}
+                    className={days === range.days ? "bg-accent" : ""}
+                  >
+                    {range.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-              onClick={() => document.documentElement.classList.toggle("dark")}
+              className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate("/connections")}
             >
+              <Settings className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="default"
+              size="sm"
+              className="h-9 px-4 text-xs font-semibold tracking-wider uppercase"
+              onClick={() => refetch?.()}
+            >
+              Refresh
+            </Button>
+          </div>
+        </header>
+
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={() => document.documentElement.classList.toggle("dark")}>
               <Sun className="h-4 w-4 hidden dark:block" />
               <Moon className="h-4 w-4 block dark:hidden" />
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={() => navigate("/connections")}>
-              <Settings className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={signOut}>
               <LogOut className="h-4 w-4" />
