@@ -9,6 +9,7 @@ import { StatsRibbon } from "@/components/dashboard/StatsRibbon";
 import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
 import { InsightCards } from "@/components/dashboard/InsightCards";
+import { WeeklySummary } from "@/components/dashboard/WeeklySummary";
 import { LogOut, Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
 import {
