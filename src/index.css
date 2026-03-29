@@ -4,100 +4,100 @@
 
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 210 11% 15%;
+    --background: 0 0% 100%;
+    --foreground: 220 20% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
+    --card-foreground: 220 20% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: 220 20% 14%;
 
-    --primary: 210 11% 15%;
-    --primary-foreground: 40 20% 98%;
+    --primary: 220 20% 14%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 20% 93%;
-    --secondary-foreground: 210 11% 15%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 14%;
 
-    --muted: 35 12% 93%;
-    --muted-foreground: 210 5% 46%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 24 80% 52%;
+    --accent: 230 65% 56%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 10% 88%;
-    --input: 30 10% 88%;
-    --ring: 24 80% 52%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 230 65% 56%;
 
     --radius: 0.625rem;
 
     /* Custom tokens */
     --glass-bg: 0 0% 100% / 0.7;
-    --glass-border: 30 10% 88%;
-    --glass-shadow: 210 11% 15% / 0.06;
+    --glass-border: 220 13% 91%;
+    --glass-shadow: 220 20% 14% / 0.06;
     --surface-elevated: 0 0% 100%;
-    --hero-bg: 210 11% 15%;
-    --hero-fg: 40 20% 98%;
-    --hero-muted: 210 5% 60%;
+    --hero-bg: 220 25% 10%;
+    --hero-fg: 220 14% 96%;
+    --hero-muted: 220 15% 65%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 210 11% 15%;
-    --sidebar-primary-foreground: 40 20% 98%;
-    --sidebar-accent: 35 20% 93%;
-    --sidebar-accent-foreground: 210 11% 15%;
-    --sidebar-border: 30 10% 88%;
-    --sidebar-ring: 24 80% 52%;
+    --sidebar-primary: 220 20% 14%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 220 20% 14%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 230 65% 56%;
   }
 
   .dark {
-    --background: 210 15% 8%;
-    --foreground: 40 10% 92%;
+    --background: 220 20% 7%;
+    --foreground: 220 14% 92%;
 
-    --card: 210 12% 12%;
-    --card-foreground: 40 10% 92%;
+    --card: 220 18% 11%;
+    --card-foreground: 220 14% 92%;
 
-    --popover: 210 12% 12%;
-    --popover-foreground: 40 10% 92%;
+    --popover: 220 18% 11%;
+    --popover-foreground: 220 14% 92%;
 
-    --primary: 40 10% 92%;
-    --primary-foreground: 210 15% 8%;
+    --primary: 220 14% 92%;
+    --primary-foreground: 220 20% 7%;
 
-    --secondary: 210 10% 16%;
-    --secondary-foreground: 40 10% 92%;
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 220 14% 92%;
 
-    --muted: 210 10% 16%;
-    --muted-foreground: 210 5% 55%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 24 80% 55%;
+    --accent: 230 65% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 30%;
-    --destructive-foreground: 40 10% 92%;
+    --destructive-foreground: 220 14% 92%;
 
-    --border: 210 10% 20%;
-    --input: 210 10% 20%;
-    --ring: 24 80% 55%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 230 65% 60%;
 
-    --glass-bg: 210 12% 12% / 0.7;
-    --glass-border: 210 10% 20%;
-    --glass-shadow: 210 15% 8% / 0.2;
-    --surface-elevated: 210 12% 14%;
-    --hero-bg: 210 11% 15%;
-    --hero-fg: 40 20% 98%;
-    --hero-muted: 210 5% 60%;
+    --glass-bg: 220 18% 11% / 0.7;
+    --glass-border: 220 15% 18%;
+    --glass-shadow: 220 20% 7% / 0.2;
+    --surface-elevated: 220 18% 13%;
+    --hero-bg: 220 25% 10%;
+    --hero-fg: 220 14% 96%;
+    --hero-muted: 220 15% 65%;
 
-    --sidebar-background: 210 15% 9%;
+    --sidebar-background: 220 20% 8%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 40 10% 92%;
-    --sidebar-primary-foreground: 210 15% 8%;
-    --sidebar-accent: 210 10% 16%;
+    --sidebar-primary: 220 14% 92%;
+    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-accent: 220 15% 15%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 210 10% 20%;
-    --sidebar-ring: 24 80% 55%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 230 65% 60%;
   }
 }
 
@@ -108,7 +108,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Georgia', 'Times New Roman', serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6,
