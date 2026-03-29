@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Minus, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ArrowRight, Sparkles } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 import { generateInsights, type DynamicInsight } from "@/lib/generateInsights";
+import { useAiInsights } from "@/hooks/useAiInsights";
 import { Sparkline } from "./Sparkline";
 
 interface Props {
@@ -10,20 +11,36 @@ interface Props {
 
 export function InsightCards({ data }: Props) {
   const insights = useMemo(() => generateInsights(data).slice(0, 3), [data]);
+  const { narratives, isLoading: aiLoading } = useAiInsights(insights);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {insights.map((insight) => (
-        <InsightCard key={insight.id} insight={insight} />
+        <InsightCard
+          key={insight.id}
+          insight={insight}
+          aiNarrative={narratives[insight.metric]}
+          aiLoading={aiLoading}
+        />
       ))}
     </div>
   );
 }
 
-function InsightCard({ insight }: { insight: DynamicInsight }) {
+function InsightCard({
+  insight,
+  aiNarrative,
+  aiLoading,
+}: {
+  insight: DynamicInsight;
+  aiNarrative?: string;
+  aiLoading: boolean;
+}) {
   const Icon = insight.icon;
   const ChangeIcon =
     insight.changeType === "up" ? TrendingUp : insight.changeType === "down" ? TrendingDown : Minus;
+
+  const displayNarrative = aiNarrative || insight.narrative;
 
   return (
     <div className="group relative rounded-2xl p-5 space-y-3 cursor-default transition-all duration-300 hover:shadow-lg hover:shadow-[hsl(var(--glass-shadow))] backdrop-blur-xl bg-[hsl(var(--glass-bg))] border border-[hsl(var(--glass-border))] hover:border-primary/20">
@@ -64,13 +81,32 @@ function InsightCard({ insight }: { insight: DynamicInsight }) {
         </div>
 
         {/* Narrative */}
-        <p className="text-sm leading-relaxed text-foreground/70 line-clamp-2">{insight.narrative}</p>
+        <div className="min-h-[2.5rem]">
+          {aiLoading && !aiNarrative ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-primary" />
+              <span className="animate-pulse">Generating AI insight…</span>
+            </div>
+          ) : (
+            <p className="text-sm leading-relaxed text-foreground/70 line-clamp-3">
+              {displayNarrative}
+            </p>
+          )}
+        </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-1">
-          <span className="text-[10px] font-semibold text-muted-foreground bg-muted/60 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
-            {insight.source}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold text-muted-foreground bg-muted/60 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
+              {insight.source}
+            </span>
+            {aiNarrative && (
+              <span className="text-[10px] font-semibold text-primary/70 bg-primary/5 backdrop-blur-sm px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-0.5">
+                <Sparkles className="w-2.5 h-2.5" />
+                AI
+              </span>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
             Explore <ArrowRight className="w-3 h-3" />
           </span>
