@@ -6,6 +6,21 @@ import { useAiInsights } from "@/hooks/useAiInsights";
 import { Sparkline } from "./Sparkline";
 import { Button } from "@/components/ui/button";
 
+function NarrativeWithAction({ text }: { text: string }) {
+  const arrowIdx = text.indexOf("→ ");
+  if (arrowIdx === -1) {
+    return <p className="text-sm leading-relaxed text-foreground/70">{text}</p>;
+  }
+  const context = text.slice(0, arrowIdx).trim();
+  const action = text.slice(arrowIdx + 2).trim();
+  return (
+    <div className="space-y-1.5">
+      <p className="text-sm leading-relaxed text-foreground/70">{context}</p>
+      <p className="text-sm font-semibold text-primary leading-snug">→ {action}</p>
+    </div>
+  );
+}
+
 interface Props {
   data: WindsorSummary;
 }
