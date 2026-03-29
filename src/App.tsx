@@ -8,7 +8,7 @@ import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Connections from "./pages/Connections.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-
+import NotFound from "./pages/NotFound.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
