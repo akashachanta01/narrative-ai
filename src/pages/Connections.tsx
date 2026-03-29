@@ -88,13 +88,38 @@ export default function Connections() {
   };
 
   const windsorConnected = connections.some((c) => c.provider === "windsor");
+  const ga4Connected = connections.some((c) => c.provider === "ga4");
 
   const handleConnectWindsor = () => {
-    // Open Windsor in a new tab to avoid iframe issues
     const redirectUrl = `${window.location.origin}/connections`;
     window.open(`${WINDSOR_OAUTH_URL}?redirect_uri=${encodeURIComponent(redirectUrl)}`, "_blank");
-    // Show manual key input as fallback
     setShowKeyInput(true);
+  };
+
+  const handleConnectGA4 = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch(
+        `https://${PROJECT_ID}.supabase.co/functions/v1/ga4-auth`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ redirect_uri: `${window.location.origin}/connections` }),
+        }
+      );
+      const json = await res.json();
+      if (json.url) {
+        window.location.href = json.url;
+      } else {
+        toast({ title: "Error", description: json.error || "Failed to start GA4 auth", variant: "destructive" });
+      }
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to connect to GA4", variant: "destructive" });
+    }
   };
 
   const handleSaveManualKey = () => {
