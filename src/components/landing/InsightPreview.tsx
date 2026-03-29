@@ -23,7 +23,7 @@ const InsightPreview = () => {
     <section className="py-24 sm:py-28">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="mb-16 max-w-xl"
+          className="mb-16 max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -38,23 +38,21 @@ const InsightPreview = () => {
           </p>
         </motion.div>
 
-        <div className="space-y-0">
+        <div className="grid gap-8 md:grid-cols-3 text-center">
           {steps.map((step, i) => (
             <motion.div
               key={i}
-              className="flex gap-6 sm:gap-10 py-8 border-t border-border group"
+              className="space-y-3"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <span className="text-3xl sm:text-4xl font-bold text-border group-hover:text-accent transition-colors font-sans shrink-0">
+              <span className="inline-block text-4xl font-bold text-accent/30 font-sans">
                 {step.number}
               </span>
-              <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 font-sans">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-md font-sans">{step.description}</p>
-              </div>
+              <h3 className="text-lg font-semibold text-foreground font-sans">{step.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto font-sans">{step.description}</p>
             </motion.div>
           ))}
         </div>

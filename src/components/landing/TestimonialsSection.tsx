@@ -26,7 +26,7 @@ const TestimonialsSection = () => {
     <section className="py-24 sm:py-28">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="mb-16 max-w-xl"
+          className="mb-16 max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -42,14 +42,14 @@ const TestimonialsSection = () => {
           {testimonials.map((t, i) => (
             <motion.div
               key={i}
-              className="p-6 rounded-xl border border-border bg-card flex flex-col justify-between"
+              className="p-6 rounded-xl border border-border bg-card flex flex-col justify-between text-center"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               <p className="text-sm text-foreground leading-relaxed mb-6 font-sans">"{t.quote}"</p>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col items-center gap-2">
                 <div className="w-9 h-9 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold font-sans">
                   {t.initials}
                 </div>

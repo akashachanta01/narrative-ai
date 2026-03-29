@@ -4,7 +4,7 @@ import databriefLogo from "@/assets/databrief-logo.png";
 
 const NavBar = () => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 backdrop-blur-lg bg-[hsl(210_11%_15%/0.9)]">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 backdrop-blur-lg" style={{ background: "hsl(220 25% 10% / 0.92)" }}>
       <div className="container px-6 max-w-6xl mx-auto flex items-center justify-between h-14">
         <div className="flex items-center gap-2.5">
           <img src={databriefLogo} alt="DataBrief" className="w-6 h-6" />

@@ -39,7 +39,7 @@ const FeaturesSection = () => {
     <section className="py-24 sm:py-28 bg-secondary/50">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="mb-16 max-w-xl"
+          className="mb-16 max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -55,13 +55,13 @@ const FeaturesSection = () => {
           {features.map((feature, i) => (
             <motion.div
               key={i}
-              className="space-y-3"
+              className="space-y-3 text-center"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
             >
-              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent mx-auto">
                 {feature.icon}
               </div>
               <h3 className="text-base font-semibold text-foreground font-sans">{feature.title}</h3>
