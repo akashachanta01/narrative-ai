@@ -8,6 +8,7 @@ import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
 import { StatsRibbon } from "@/components/dashboard/StatsRibbon";
 import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
+import { InsightCards } from "@/components/dashboard/InsightCards";
 import { LogOut, Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -120,6 +121,9 @@ export default function Dashboard() {
               <StatsRibbon data={windsorData} />
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="px-4 sm:px-6 pb-4">
+              <InsightCards data={windsorData} />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }} className="px-4 sm:px-6 pb-4">
               <TrafficChart data={windsorData} />
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="px-4 sm:px-6 pb-8">
