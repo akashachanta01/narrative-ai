@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Search, X } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 
 interface Props {
@@ -29,6 +29,7 @@ export function SourceTable({ data }: Props) {
   const [tab, setTab] = useState<Tab>("source");
   const [sortKey, setSortKey] = useState<SortKey>("sessions");
   const [sortAsc, setSortAsc] = useState(false);
+  const [search, setSearch] = useState("");
 
   const rows = data.rows;
 
@@ -87,15 +88,21 @@ export function SourceTable({ data }: Props) {
     [baseRows, totalSessions]
   );
 
+  // Filter by search
+  const filtered = useMemo(() => {
+    if (!search.trim()) return enriched;
+    const q = search.toLowerCase();
+    return enriched.filter((r) => r.name.toLowerCase().includes(q));
+  }, [enriched, search]);
+
   // Sort
   const sorted = useMemo(() => {
-    const s = [...enriched].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const av = a[sortKey];
       const bv = b[sortKey];
       return sortAsc ? av - bv : bv - av;
     });
-    return s;
-  }, [enriched, sortKey, sortAsc]);
+  }, [filtered, sortKey, sortAsc]);
 
   const maxSessions = Math.max(...sorted.map((r) => r.sessions), 1);
 
@@ -145,6 +152,26 @@ export function SourceTable({ data }: Props) {
           By Day
         </button>
         <div className="flex-1" />
+        {tab === "source" && (
+          <div className="relative flex items-center mr-3">
+            <Search className="absolute left-2 w-3 h-3 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Filter sources…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-7 w-36 pl-7 pr-7 text-xs rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-1.5 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
         <span className="text-[11px] text-muted-foreground pr-4">
           {sorted.length} {tab === "source" ? "sources" : "days"}
         </span>
