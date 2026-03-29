@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 
 const features = [
-  "Unlimited narrative insights",
+  "Unlimited data insights",
   "GA4 + Shopify + Meta Ads",
   "Conversational chat interface",
   "Daily anomaly alerts",

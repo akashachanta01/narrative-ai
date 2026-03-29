@@ -15,7 +15,7 @@ const features = [
   {
     icon: <Zap className="w-6 h-6" />,
     title: "Proactive Insights",
-    description: "Don't wait to ask. NarrativeMetrics surfaces anomalies and opportunities the moment they happen.",
+    description: "Don't wait to ask. DataBrief surfaces anomalies and opportunities the moment they happen.",
   },
 ];
 

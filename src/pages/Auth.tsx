@@ -82,7 +82,7 @@ export default function Auth() {
           <p className="text-muted-foreground text-sm">
             {isLogin
               ? "Sign in to access your dashboard"
-              : "Start getting narrative insights today"}
+              : "Start getting data insights today"}
           </p>
         </div>
 

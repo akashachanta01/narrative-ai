@@ -9,6 +9,7 @@ import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
 import { InsightCards } from "@/components/dashboard/InsightCards";
 import { Settings, Loader2, Sparkles, Sun, Moon, ChevronDown, CalendarDays } from "lucide-react";
+import databriefLogo from "@/assets/databrief-logo.png";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -66,10 +67,8 @@ export default function Dashboard() {
         {/* Top bar */}
         <header className="px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 border-b border-border/50">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
-            </div>
-            <span className="text-sm font-semibold text-foreground tracking-tight">Narrative</span>
+            <img src={databriefLogo} alt="DataBrief" className="w-7 h-7" />
+            <span className="text-sm font-semibold text-foreground tracking-tight">DataBrief</span>
           </div>
 
           <div className="flex items-center gap-2">

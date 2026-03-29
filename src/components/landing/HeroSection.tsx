@@ -39,7 +39,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          NarrativeMetrics turns your data into plain-English insights.
+          DataBrief turns your data into plain-English insights.
           No dashboards to decode — just clear answers about what's happening
           and what to do next.
         </motion.p>
