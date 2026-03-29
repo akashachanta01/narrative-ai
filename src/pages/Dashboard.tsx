@@ -118,8 +118,8 @@ export default function Dashboard() {
               variant="default"
               size="sm"
               className="h-9 px-4 text-xs font-semibold tracking-wider uppercase"
-              onClick={() => refetch?.()}
-              disabled={windsorLoading}
+              onClick={() => refetch()}
+              disabled={windsorLoading || !hasData}
             >
               {windsorLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Refresh"}
             </Button>
