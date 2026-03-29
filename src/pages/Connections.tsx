@@ -495,6 +495,9 @@ function IntegrationCard({
   setManualKey,
   onSaveKey,
   onDisconnect,
+  onHealthCheck,
+  checkingHealth,
+  healthResult,
   saving,
 }: {
   integration: Integration;
@@ -503,6 +506,9 @@ function IntegrationCard({
   setManualKey: (v: string) => void;
   onSaveKey: () => void;
   onDisconnect: () => void;
+  onHealthCheck: () => void;
+  checkingHealth: boolean;
+  healthResult?: HealthResult;
   saving: boolean;
 }) {
   const Icon = integration.icon;
