@@ -1,9 +1,10 @@
 import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Minus, ArrowRight, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 import { generateInsights, type DynamicInsight } from "@/lib/generateInsights";
 import { useAiInsights } from "@/hooks/useAiInsights";
 import { Sparkline } from "./Sparkline";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   data: WindsorSummary;
@@ -11,7 +12,7 @@ interface Props {
 
 export function InsightCards({ data }: Props) {
   const insights = useMemo(() => generateInsights(data).slice(0, 3), [data]);
-  const { narratives, isLoading: aiLoading } = useAiInsights(insights);
+  const { narratives, isLoading: aiLoading, loadingIds, regenerate } = useAiInsights(insights);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -20,7 +21,8 @@ export function InsightCards({ data }: Props) {
           key={insight.id}
           insight={insight}
           aiNarrative={narratives[insight.metric]}
-          aiLoading={aiLoading}
+          aiLoading={aiLoading || loadingIds.has(insight.metric)}
+          onRegenerate={() => regenerate(insight.metric)}
         />
       ))}
     </div>
@@ -31,10 +33,12 @@ function InsightCard({
   insight,
   aiNarrative,
   aiLoading,
+  onRegenerate,
 }: {
   insight: DynamicInsight;
   aiNarrative?: string;
   aiLoading: boolean;
+  onRegenerate: () => void;
 }) {
   const Icon = insight.icon;
   const ChangeIcon =
@@ -44,7 +48,6 @@ function InsightCard({
 
   return (
     <div className="group relative rounded-2xl p-5 space-y-3 cursor-default transition-all duration-300 hover:shadow-lg hover:shadow-[hsl(var(--glass-shadow))] backdrop-blur-xl bg-[hsl(var(--glass-bg))] border border-[hsl(var(--glass-border))] hover:border-primary/20">
-      {/* Glow on hover */}
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/[0.04] to-transparent" />
 
       <div className="relative space-y-3">
@@ -107,9 +110,21 @@ function InsightCard({
               </span>
             )}
           </div>
-          <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-            Explore <ArrowRight className="w-3 h-3" />
-          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={onRegenerate}
+              disabled={aiLoading}
+              title="Regenerate insight"
+            >
+              <RefreshCw className={`w-3 h-3 ${aiLoading ? "animate-spin" : ""}`} />
+            </Button>
+            <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+              Explore <ArrowRight className="w-3 h-3" />
+            </span>
+          </div>
         </div>
       </div>
     </div>
