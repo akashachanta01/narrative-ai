@@ -1,24 +1,22 @@
-import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Minus, Sparkles, RefreshCw } from "lucide-react";
+import { useMemo, useState } from "react";
+import { TrendingUp, TrendingDown, Minus, Sparkles, RefreshCw, Zap } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 import { generateInsights, type DynamicInsight } from "@/lib/generateInsights";
 import { useAiInsights } from "@/hooks/useAiInsights";
 import { Sparkline } from "./Sparkline";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
-function NarrativeWithAction({ text }: { text: string }) {
+function parseNarrative(text: string) {
   const arrowIdx = text.indexOf("→ ");
-  if (arrowIdx === -1) {
-    return <p className="text-sm leading-relaxed text-foreground/70">{text}</p>;
-  }
-  const context = text.slice(0, arrowIdx).trim();
-  const action = text.slice(arrowIdx + 2).trim();
-  return (
-    <div className="space-y-1.5">
-      <p className="text-sm leading-relaxed text-foreground/70">{context}</p>
-      <p className="text-sm font-semibold text-primary leading-snug">→ {action}</p>
-    </div>
-  );
+  if (arrowIdx === -1) return { context: text, action: "" };
+  return { context: text.slice(0, arrowIdx).trim(), action: text.slice(arrowIdx + 2).trim() };
 }
 
 interface Props {
