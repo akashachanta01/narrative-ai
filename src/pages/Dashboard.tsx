@@ -59,7 +59,7 @@ export default function Dashboard() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar — minimal, clean */}
-        <header className="px-8 py-5 flex items-center justify-between shrink-0">
+        <header className="px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
@@ -87,7 +87,7 @@ export default function Dashboard() {
         ) : hasData && insights.length > 0 ? (
           <main className="flex-1 overflow-y-auto">
             {/* Hero greeting */}
-            <div className="px-8 pt-6 pb-8">
+            <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export default function Dashboard() {
                 className="max-w-2xl"
               >
                 <p className="text-sm text-muted-foreground mb-1">{getDateString()}</p>
-                <h1 className="text-3xl font-bold text-foreground tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
                   {getGreeting()}, {firstName}
                 </h1>
                 <p className="text-base text-muted-foreground mt-2 leading-relaxed">
@@ -108,12 +108,12 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.15 }}
-                className="mt-6 flex gap-4 flex-wrap"
+                className="mt-4 sm:mt-6 flex gap-3 sm:gap-4 flex-wrap"
               >
                 {insights.slice(0, 3).map((insight, i) => (
                   <div
                     key={insight.id + "-stat"}
-                    className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-card border border-border/60 shadow-sm"
+                    className="flex items-center gap-3 px-4 sm:px-5 py-3 rounded-2xl bg-card border border-border/60 shadow-sm min-w-0 flex-1 sm:flex-none"
                   >
                     <div className={`w-8 h-8 rounded-xl bg-accent flex items-center justify-center`}>
                       <insight.icon className={`w-4 h-4 ${insight.iconColor}`} />
@@ -139,7 +139,7 @@ export default function Dashboard() {
             </div>
 
             {/* Divider */}
-            <div className="px-8">
+            <div className="px-4 sm:px-8">
               <div className="flex items-center gap-3 mb-6">
                 <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Insights</h2>
                 <div className="flex-1 h-px bg-border" />
@@ -156,7 +156,7 @@ export default function Dashboard() {
             </div>
 
             {/* Insight cards */}
-            <div className="px-8 pb-10">
+            <div className="px-4 sm:px-8 pb-10">
               <div className="max-w-3xl space-y-5">
                 {insights.map((insight, index) => (
                   <motion.div
