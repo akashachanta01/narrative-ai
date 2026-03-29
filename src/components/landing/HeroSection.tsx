@@ -19,7 +19,7 @@ const HeroSection = () => {
         >
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-border bg-card text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="text-amber-500">★</span> Trusted by 500+ businesses
+              <span className="text-primary">★</span> Trusted by 500+ businesses
             </span>
             <span className="w-px h-4 bg-border" />
             <span>No credit card required</span>
