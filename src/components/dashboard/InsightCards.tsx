@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Minus, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Sparkles, RefreshCw } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 import { generateInsights, type DynamicInsight } from "@/lib/generateInsights";
 import { useAiInsights } from "@/hooks/useAiInsights";
