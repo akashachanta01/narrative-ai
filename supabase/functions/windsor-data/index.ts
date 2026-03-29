@@ -50,11 +50,17 @@ serve(async (req) => {
       });
     }
 
+    // Parse days from query string
+    const url = new URL(req.url);
+    const days = parseInt(url.searchParams.get("days") || "7", 10);
+    const presetMap: Record<number, string> = { 7: "last_7d", 30: "last_30d", 90: "last_90d" };
+    const datePreset = presetMap[days] || "last_7d";
+
     // Fetch Marketing Common Data Model from Windsor.ai
     const params = new URLSearchParams({
       api_key: connection.api_key,
       fields: "date,source,clicks,spend,sessions,conversions,revenue",
-      date_preset: "last_7d",
+      date_preset: datePreset,
     });
 
     const windsorRes = await fetch(`https://connectors.windsor.ai/all?${params.toString()}`);

@@ -8,13 +8,28 @@ import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
 import { StatsRibbon } from "@/components/dashboard/StatsRibbon";
 import { TrafficChart } from "@/components/dashboard/TrafficChart";
 import { SourceTable } from "@/components/dashboard/SourceTable";
-import { LogOut, Settings, Loader2, Sparkles, RefreshCw, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
+import { LogOut, Settings, Loader2, Sparkles, RefreshCw, Sun, Moon, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const DATE_RANGES = [
+  { label: "Last 7 days", days: 7 },
+  { label: "Last 30 days", days: 30 },
+  { label: "Last 90 days", days: 90 },
+] as const;
 
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
-  const { data: windsorData, isLoading: windsorLoading, refetch } = useWindsorData();
+  const [days, setDays] = useState(7);
+  const { data: windsorData, isLoading: windsorLoading, refetch } = useWindsorData(days);
+
+  const activeRange = DATE_RANGES.find((r) => r.days === days) || DATE_RANGES[0];
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -48,20 +63,33 @@ export default function Dashboard() {
               <span className="text-sm font-semibold text-foreground tracking-tight">Narrative</span>
             </div>
 
-            {/* Date range controls */}
-            <div className="hidden sm:flex items-center gap-1.5 ml-2">
-              <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                <ChevronLeft className="w-3 h-3" />
-              </Button>
-              <span className="text-xs font-medium text-foreground px-2">Last 7 days</span>
-              <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
-                <ChevronRight className="w-3 h-3" />
-              </Button>
-              <span className="text-xs text-muted-foreground border border-border rounded px-2 py-0.5 ml-1">Daily</span>
+            {/* Date range dropdown */}
+            <div className="flex items-center gap-1.5 ml-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 px-3">
+                    {activeRange.label}
+                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {DATE_RANGES.map((range) => (
+                    <DropdownMenuItem
+                      key={range.days}
+                      onClick={() => setDays(range.days)}
+                      className={days === range.days ? "bg-accent" : ""}
+                    >
+                      {range.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <span className="hidden sm:inline text-xs text-muted-foreground border border-border rounded px-2 py-0.5">Daily</span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground ml-1"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                 onClick={() => refetch?.()}
               >
                 <RefreshCw className="w-3 h-3" />
@@ -98,32 +126,13 @@ export default function Dashboard() {
           </div>
         ) : hasData ? (
           <main className="flex-1 overflow-y-auto">
-            {/* Stats ribbon */}
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <StatsRibbon data={windsorData} />
             </motion.div>
-
-            {/* Chart */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="px-4 sm:px-6 pb-4"
-            >
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }} className="px-4 sm:px-6 pb-4">
               <TrafficChart data={windsorData} />
             </motion.div>
-
-            {/* Tables */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="px-4 sm:px-6 pb-8"
-            >
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="px-4 sm:px-6 pb-8">
               <SourceTable data={windsorData} />
             </motion.div>
           </main>

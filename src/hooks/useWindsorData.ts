@@ -3,9 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { WindsorDataRow, WindsorSummary } from "@/lib/windsorTypes";
 import { summarizeWindsorData } from "@/lib/windsorTypes";
 
-export function useWindsorData() {
+export function useWindsorData(days: number = 7) {
   return useQuery<WindsorSummary | null>({
-    queryKey: ["marketing-data"],
+    queryKey: ["marketing-data", days],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return null;
@@ -18,7 +18,7 @@ export function useWindsorData() {
 
       // Try Windsor first
       const windsorRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/windsor-data`,
+        `https://${projectId}.supabase.co/functions/v1/windsor-data?days=${days}`,
         { headers }
       );
       const windsorJson = await windsorRes.json();
@@ -29,7 +29,7 @@ export function useWindsorData() {
 
       // Try GA4
       const ga4Res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/ga4-data`,
+        `https://${projectId}.supabase.co/functions/v1/ga4-data?days=${days}`,
         { headers }
       );
       const ga4Json = await ga4Res.json();
