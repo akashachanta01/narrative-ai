@@ -8,7 +8,7 @@ import { EmptyStateConnect } from "@/components/dashboard/EmptyStateConnect";
 import { ChatSidebar } from "@/components/dashboard/ChatSidebar";
 import { generateInsights } from "@/lib/generateInsights";
 import type { DynamicInsight } from "@/lib/generateInsights";
-import { LogOut, Settings, Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { LogOut, Settings, Loader2, Sparkles, RefreshCw, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
 function getGreeting(): string {
@@ -67,6 +67,17 @@ export default function Dashboard() {
             <span className="text-base font-semibold text-foreground tracking-tight">Narrative</span>
           </div>
           <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                document.documentElement.classList.toggle("dark");
+              }}
+            >
+              <Sun className="h-4 w-4 hidden dark:block" />
+              <Moon className="h-4 w-4 block dark:hidden" />
+            </Button>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" onClick={() => navigate("/connections")}>
               <Settings className="h-4 w-4" />
             </Button>
