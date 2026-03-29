@@ -1,6 +1,8 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { InsightCard } from "@/lib/mockInsights";
+import type { DynamicInsight } from "@/lib/generateInsights";
 
+type InsightProps = InsightCard | DynamicInsight;
 export function InsightCardComponent({ insight }: { insight: InsightCard }) {
   const Icon = insight.icon;
   const ChangeIcon =
