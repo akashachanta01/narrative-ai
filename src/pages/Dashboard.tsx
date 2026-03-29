@@ -105,17 +105,6 @@ export default function Dashboard() {
           </div>
         </header>
 
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={() => document.documentElement.classList.toggle("dark")}>
-              <Sun className="h-4 w-4 hidden dark:block" />
-              <Moon className="h-4 w-4 block dark:hidden" />
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </header>
-
         {/* Content */}
         {windsorLoading ? (
           <div className="flex-1 flex items-center justify-center">
