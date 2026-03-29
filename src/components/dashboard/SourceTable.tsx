@@ -23,6 +23,7 @@ interface EnrichedRow extends AggRow {
   roas: number;
   cpc: number;
   sessionShare: number;
+  tag: { label: string; color: string } | null;
 }
 
 export function SourceTable({ data }: Props) {
@@ -75,17 +76,38 @@ export function SourceTable({ data }: Props) {
   const baseRows = tab === "source" ? sourceRows : dateRows;
   const totalSessions = data.totalSessions || 1;
 
-  // Enrich with derived metrics
+  // Compute averages for tagging
+  const avgConvRate = data.totalSessions > 0 ? (data.totalConversions / data.totalSessions) * 100 : 0;
+  const avgRoas = data.totalSpend > 0 ? data.totalRevenue / data.totalSpend : 0;
+
+  // Enrich with derived metrics + contextual tags
   const enriched: EnrichedRow[] = useMemo(
     () =>
-      baseRows.map((r) => ({
-        ...r,
-        convRate: r.sessions > 0 ? (r.conversions / r.sessions) * 100 : 0,
-        roas: r.spend > 0 ? r.revenue / r.spend : 0,
-        cpc: r.clicks > 0 ? r.spend / r.clicks : 0,
-        sessionShare: (r.sessions / totalSessions) * 100,
-      })),
-    [baseRows, totalSessions]
+      baseRows.map((r) => {
+        const convRate = r.sessions > 0 ? (r.conversions / r.sessions) * 100 : 0;
+        const roas = r.spend > 0 ? r.revenue / r.spend : 0;
+        const cpc = r.clicks > 0 ? r.spend / r.clicks : 0;
+        const sessionShare = (r.sessions / totalSessions) * 100;
+
+        // Determine contextual tag
+        let tag: EnrichedRow["tag"] = null;
+        if (tab === "source") {
+          if (hasRevenue && r.revenue > 0 && r.revenue === Math.max(...baseRows.map((x) => x.revenue))) {
+            tag = { label: "💰 Revenue Leader", color: "bg-green-500/10 text-green-600 dark:text-green-400" };
+          } else if (hasConversions && convRate > 0 && convRate < avgConvRate * 0.7 && r.sessions > totalSessions * 0.1) {
+            tag = { label: "🎯 Conv. Opportunity", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" };
+          } else if (hasSpend && roas > 0 && roas < 1) {
+            tag = { label: "⚠️ Unprofitable", color: "bg-red-500/10 text-red-500 dark:text-red-400" };
+          } else if (hasConversions && convRate > avgConvRate * 1.5 && r.conversions > 0) {
+            tag = { label: "⭐ High Converter", color: "bg-primary/10 text-primary" };
+          } else if (hasSpend && hasRevenue && roas >= 3) {
+            tag = { label: "🚀 Efficient", color: "bg-green-500/10 text-green-600 dark:text-green-400" };
+          }
+        }
+
+        return { ...r, convRate, roas, cpc, sessionShare, tag };
+      }),
+    [baseRows, totalSessions, tab, avgConvRate, hasRevenue, hasConversions, hasSpend]
   );
 
   // Filter by search
@@ -205,7 +227,14 @@ export function SourceTable({ data }: Props) {
               <tr key={row.name} className="group hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-2.5 text-xs text-muted-foreground tabular-nums">{i + 1}</td>
                 <td className="px-2 py-2.5">
-                  <span className="text-sm font-medium text-foreground truncate block max-w-[180px]">{row.name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground truncate max-w-[160px]">{row.name}</span>
+                    {row.tag && (
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0 ${row.tag.color}`}>
+                        {row.tag.label}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-2 py-2.5">
                   <div className="flex items-center gap-2">
