@@ -2,6 +2,7 @@ import NavBar from "@/components/landing/NavBar";
 import HeroSection from "@/components/landing/HeroSection";
 import InsightPreview from "@/components/landing/InsightPreview";
 import FeaturesSection from "@/components/landing/FeaturesSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import PricingSection from "@/components/landing/PricingSection";
 import FooterSection from "@/components/landing/FooterSection";
 
@@ -17,6 +18,7 @@ const Index = () => {
         <div id="features">
           <FeaturesSection />
         </div>
+        <TestimonialsSection />
         <div id="pricing">
           <PricingSection />
         </div>
