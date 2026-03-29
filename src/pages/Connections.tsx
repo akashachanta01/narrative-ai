@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { ExternalLink, CheckCircle2, Loader2, LogOut, KeyRound, ArrowLeft } from "lucide-react";
 
 const WINDSOR_OAUTH_URL = "https://onboard.windsor.ai/";
+const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 
 interface Connection {
   id: string;
