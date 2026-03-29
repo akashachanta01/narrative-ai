@@ -8,7 +8,9 @@ interface Props {
 interface StatItem {
   label: string;
   value: string;
+  rawValue: number;
   change: number | null;
+  priority: number; // lower = more important
 }
 
 export function StatsRibbon({ data }: Props) {
@@ -40,16 +42,45 @@ export function StatsRibbon({ data }: Props) {
 
   const convRate = data.totalSessions > 0 ? ((data.totalConversions / data.totalSessions) * 100) : 0;
   const revenuePerSession = data.totalSessions > 0 ? (data.totalRevenue / data.totalSessions) : 0;
+  const uniqueSources = new Set(rows.map((r) => r.source)).size;
 
-  const stats: StatItem[] = [
-    { label: "Sessions", value: data.totalSessions.toLocaleString(), change: pctChange("sessions") },
-    { label: "Revenue", value: `$${data.totalRevenue.toLocaleString()}`, change: pctChange("revenue") },
-    { label: "Conv. rate", value: `${convRate.toFixed(2)}%`, change: null },
-    { label: "Rev/session", value: `$${revenuePerSession.toFixed(2)}`, change: null },
-    { label: "Clicks", value: data.totalClicks.toLocaleString(), change: pctChange("clicks") },
-    { label: "Spend", value: `$${data.totalSpend.toLocaleString()}`, change: pctChange("spend") },
-    { label: "ROAS", value: data.roas > 0 ? `${data.roas.toFixed(1)}x` : "—", change: null },
+  // Build all possible stats with priorities
+  const allStats: StatItem[] = [
+    // Sessions — always important, always shown first
+    { label: "Sessions", value: data.totalSessions.toLocaleString(), rawValue: data.totalSessions, change: pctChange("sessions"), priority: 0 },
+    // Revenue — high priority if available
+    { label: "Revenue", value: `$${data.totalRevenue.toLocaleString()}`, rawValue: data.totalRevenue, change: pctChange("revenue"), priority: 1 },
+    // Conversions — show if non-zero
+    { label: "Conversions", value: data.totalConversions.toLocaleString(), rawValue: data.totalConversions, change: pctChange("conversions"), priority: 2 },
+    // Conv rate — only meaningful with conversions
+    { label: "Conv. rate", value: `${convRate.toFixed(2)}%`, rawValue: convRate, change: null, priority: 3 },
+    // Clicks
+    { label: "Clicks", value: data.totalClicks.toLocaleString(), rawValue: data.totalClicks, change: pctChange("clicks"), priority: 4 },
+    // Spend
+    { label: "Spend", value: `$${data.totalSpend.toLocaleString()}`, rawValue: data.totalSpend, change: pctChange("spend"), priority: 5 },
+    // ROAS — only if spend > 0
+    { label: "ROAS", value: `${data.roas.toFixed(1)}x`, rawValue: data.roas, change: null, priority: 6 },
+    // Rev/session — only if revenue > 0
+    { label: "Rev/session", value: `$${revenuePerSession.toFixed(2)}`, rawValue: revenuePerSession, change: null, priority: 7 },
+    // Sources count — always available as a fallback
+    { label: "Sources", value: uniqueSources.toString(), rawValue: uniqueSources, change: null, priority: 8 },
+    // Days tracked
+    { label: "Days tracked", value: dates.length.toString(), rawValue: dates.length, change: null, priority: 9 },
   ];
+
+  // Filter: only show stats with meaningful (non-zero) data
+  // Sessions is always shown; derived stats (conv rate, ROAS, rev/session) require their base to be > 0
+  const visibleStats = allStats.filter((s) => {
+    if (s.label === "Sessions") return true; // always show
+    if (s.label === "Conv. rate") return data.totalConversions > 0;
+    if (s.label === "ROAS") return data.totalSpend > 0 && data.totalRevenue > 0;
+    if (s.label === "Rev/session") return data.totalRevenue > 0;
+    if (s.label === "Sources" || s.label === "Days tracked") return true; // fallback stats
+    return s.rawValue > 0;
+  });
+
+  // Sort by priority, take top 6
+  const stats = visibleStats.sort((a, b) => a.priority - b.priority).slice(0, 6);
 
   return (
     <div className="px-4 sm:px-6 py-4 overflow-x-auto">
