@@ -232,38 +232,45 @@ export default function Connections() {
           </div>
         )}
 
-        <div className="space-y-4">
-          {integrations.map((integration) => (
-            <div key={integration.name} className="glass-card p-6 space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground">{integration.name}</h3>
-                    {integration.comingSoon && (
-                      <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                        Coming soon
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{integration.description}</p>
-                </div>
+        {/* Group by category */}
+        {(() => {
+          const categories = [...new Set(integrations.map((i) => i.category))];
+          return categories.map((cat) => (
+            <div key={cat} className="space-y-3">
+              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em] px-1">{cat}</h3>
+              {integrations
+                .filter((i) => i.category === cat)
+                .map((integration) => (
+                  <div key={integration.name} className="glass-card p-6 space-y-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{integration.name}</h3>
+                          {integration.comingSoon && (
+                            <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium">
+                              Coming soon
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{integration.description}</p>
+                      </div>
 
-                {integration.connected ? (
-                  <div className="flex items-center gap-2 text-primary shrink-0">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="text-sm font-medium">Connected</span>
-                  </div>
-                ) : (
-                  <Button
-                    variant={integration.comingSoon ? "outline" : "hero"}
-                    size="sm"
-                    onClick={integration.onConnect}
-                    disabled={integration.comingSoon}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    Connect
-                  </Button>
-                )}
+                      {integration.connected ? (
+                        <div className="flex items-center gap-2 text-primary shrink-0">
+                          <CheckCircle2 className="h-5 w-5" />
+                          <span className="text-sm font-medium">Connected</span>
+                        </div>
+                      ) : (
+                        <Button
+                          variant={integration.comingSoon ? "outline" : "hero"}
+                          size="sm"
+                          onClick={integration.onConnect}
+                          disabled={integration.comingSoon}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Connect
+                        </Button>
+                      )}
               </div>
 
               {/* Manual API key input for Windsor */}
