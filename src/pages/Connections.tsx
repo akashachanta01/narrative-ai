@@ -15,6 +15,8 @@ interface Connection {
   created_at: string;
 }
 
+type ManualKeyState = "idle" | "input" | "saving";
+
 export default function Connections() {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
