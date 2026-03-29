@@ -42,6 +42,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("dark-mode", String(darkMode));
   }, [darkMode]);
 
   if (loading) {
