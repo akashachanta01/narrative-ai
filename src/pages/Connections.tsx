@@ -145,10 +145,9 @@ export default function Connections() {
     },
     {
       name: "Google Analytics 4",
-      description: "Pull website traffic, conversions, and audience data directly.",
-      connected: false,
-      onConnect: () => toast({ title: "Coming soon", description: "GA4 direct integration is on the roadmap." }),
-      comingSoon: true,
+      description: "Pull website traffic, conversions, and audience data directly via OAuth.",
+      connected: ga4Connected,
+      onConnect: handleConnectGA4,
     },
     {
       name: "Shopify",
