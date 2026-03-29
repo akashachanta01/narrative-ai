@@ -7,18 +7,19 @@ const NavBar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 backdrop-blur-lg bg-background/80">
       <div className="container px-6 max-w-6xl mx-auto flex items-center justify-between h-16">
         <div className="flex items-center gap-2.5">
-          <img src={databriefLogo} alt="DataBrief" className="w-8 h-8" />
-          <span className="text-lg font-semibold tracking-tight">DataBrief</span>
+          <img src={databriefLogo} alt="DataBrief" className="w-7 h-7" />
+          <span className="text-lg font-semibold tracking-tight text-foreground">DataBrief</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+          <a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a>
           <a href="#features" className="hover:text-foreground transition-colors">Features</a>
           <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
         </div>
 
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild><Link to="/auth">Log in</Link></Button>
-          <Button variant="hero" size="sm" className="rounded-lg" asChild><Link to="/auth">Start Free Trial</Link></Button>
+          <Button size="sm" className="rounded-lg" asChild><Link to="/auth">Try It Free</Link></Button>
         </div>
       </div>
     </nav>

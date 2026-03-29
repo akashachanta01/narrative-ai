@@ -1,58 +1,74 @@
 import { motion } from "framer-motion";
-import { MessageSquareText, Link2, Zap } from "lucide-react";
+import { Link2, MessageSquareText, Zap, BarChart3, Bell, Shield } from "lucide-react";
 
 const features = [
   {
-    icon: <MessageSquareText className="w-6 h-6" />,
-    title: "Conversational Analytics",
-    description: "Ask 'Why did my traffic drop?' and get a plain-English answer with data-backed reasoning — no SQL required.",
+    icon: <Link2 className="w-5 h-5" />,
+    title: "Connect in one click",
+    description: "GA4, Shopify, Meta Ads, Stripe — link your tools and see unified data in seconds. No code, no consultants.",
   },
   {
-    icon: <Link2 className="w-6 h-6" />,
-    title: "One-Click Connections",
-    description: "Connect GA4, Shopify, Meta Ads, and more through our data bridge. Your metrics, normalized and ready in seconds.",
+    icon: <MessageSquareText className="w-5 h-5" />,
+    title: "Ask questions, get answers",
+    description: "Type 'Why did my revenue drop?' and get a clear, data-backed explanation — not another chart to decode.",
   },
   {
-    icon: <Zap className="w-6 h-6" />,
-    title: "Proactive Insights",
-    description: "Don't wait to ask. DataBrief surfaces anomalies and opportunities the moment they happen.",
+    icon: <Zap className="w-5 h-5" />,
+    title: "Instant action items",
+    description: "Every insight comes with a concrete next step. Know exactly what to do and why it matters.",
+  },
+  {
+    icon: <Bell className="w-5 h-5" />,
+    title: "Proactive alerts",
+    description: "Don't wait to discover problems. DataBrief flags anomalies and opportunities the moment they appear.",
+  },
+  {
+    icon: <BarChart3 className="w-5 h-5" />,
+    title: "Metrics that matter",
+    description: "Stop drowning in data. See only the KPIs that move your business — sessions, revenue, ROAS, and more.",
+  },
+  {
+    icon: <Shield className="w-5 h-5" />,
+    title: "Enterprise-grade security",
+    description: "Your data stays yours. SOC 2 compliant infrastructure with end-to-end encryption and granular access controls.",
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section className="py-24 bg-secondary/30">
+    <section className="py-24">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
           className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Your data, your language
+          <p className="text-sm font-semibold text-primary mb-3 tracking-wide uppercase">Features</p>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
+            Everything you need to understand your data
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Built for business owners who want answers, not charts.
+            Built for business owners who want answers, not a degree in analytics.
           </p>
         </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, i) => (
             <motion.div
               key={i}
-              className="glass-card p-8 text-center space-y-4"
-              initial={{ opacity: 0, y: 30 }}
+              className="space-y-3"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center mx-auto">
+              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-accent-foreground">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </div>
