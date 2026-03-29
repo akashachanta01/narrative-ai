@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Search, X } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 
 interface Props {
