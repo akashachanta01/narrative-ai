@@ -155,9 +155,7 @@ export default function Connections() {
   };
 
   const handleConnectWindsor = () => {
-    const redirectUrl = `${window.location.origin}/connections`;
-    window.open(`${WINDSOR_OAUTH_URL}?redirect_uri=${encodeURIComponent(redirectUrl)}`, "_blank");
-    setShowKeyInput(true);
+    navigate("/connections/windsor");
   };
 
   const handleConnectGA4 = async () => {
