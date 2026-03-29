@@ -11,7 +11,9 @@ const Index = () => {
       <NavBar />
       <main className="pt-16">
         <HeroSection />
-        <InsightPreview />
+        <div id="how-it-works">
+          <InsightPreview />
+        </div>
         <div id="features">
           <FeaturesSection />
         </div>

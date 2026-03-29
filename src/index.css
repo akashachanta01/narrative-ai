@@ -4,44 +4,45 @@
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 230 25% 12%;
+    --background: 0 0% 100%;
+    --foreground: 220 20% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 230 25% 12%;
+    --card-foreground: 220 20% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 12%;
+    --popover-foreground: 220 20% 14%;
 
-    --primary: 243 75% 59%;
+    --primary: 220 65% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 230 25% 12%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 14%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 230 10% 46%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 243 75% 96%;
-    --accent-foreground: 243 75% 40%;
+    --accent: 220 40% 94%;
+    --accent-foreground: 220 65% 38%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 243 75% 59%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 65% 48%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --glass-bg: 0 0% 100% / 0.6;
-    --glass-border: 0 0% 100% / 0.3;
-    --glass-shadow: 243 75% 59% / 0.08;
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 220 13% 91%;
+    --glass-shadow: 220 20% 14% / 0.06;
     --surface-elevated: 0 0% 100%;
-    --gradient-primary: linear-gradient(135deg, hsl(243 75% 59%), hsl(260 70% 55%));
-    --gradient-subtle: linear-gradient(180deg, hsl(240 5% 98%), hsl(0 0% 99%));
-    --hero-glow: radial-gradient(ellipse 60% 50% at 50% -10%, hsl(243 75% 59% / 0.12), transparent);
+    --gradient-primary: linear-gradient(135deg, hsl(220 65% 48%), hsl(240 50% 55%));
+    --gradient-subtle: linear-gradient(180deg, hsl(220 14% 98%), hsl(0 0% 100%));
+    --hero-glow: radial-gradient(ellipse 80% 50% at 50% 0%, hsl(220 65% 48% / 0.06), transparent);
+    --warm-glow: radial-gradient(ellipse 60% 40% at 20% 50%, hsl(30 80% 60% / 0.06), transparent);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -50,50 +51,50 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 243 75% 59%;
+    --sidebar-ring: 220 65% 48%;
   }
 
   .dark {
-    --background: 230 25% 6%;
+    --background: 220 20% 7%;
     --foreground: 0 0% 95%;
 
-    --card: 230 20% 10%;
+    --card: 220 18% 11%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 230 20% 10%;
+    --popover: 220 18% 11%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 243 75% 65%;
+    --primary: 220 65% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 230 15% 15%;
+    --secondary: 220 14% 15%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 230 15% 15%;
-    --muted-foreground: 230 10% 55%;
+    --muted: 220 14% 15%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 243 40% 18%;
-    --accent-foreground: 243 75% 75%;
+    --accent: 220 30% 18%;
+    --accent-foreground: 220 65% 70%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 230 15% 18%;
-    --input: 230 15% 18%;
-    --ring: 243 75% 65%;
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 220 65% 58%;
 
-    --glass-bg: 230 20% 10% / 0.6;
-    --glass-border: 0 0% 100% / 0.08;
-    --glass-shadow: 243 75% 59% / 0.15;
-    --surface-elevated: 230 20% 12%;
-    --sidebar-background: 230 25% 8%;
+    --glass-bg: 220 18% 11% / 0.7;
+    --glass-border: 220 14% 18%;
+    --glass-shadow: 220 20% 7% / 0.2;
+    --surface-elevated: 220 18% 13%;
+    --sidebar-background: 220 20% 9%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 243 75% 65%;
+    --sidebar-ring: 220 65% 58%;
   }
 }
 
@@ -113,8 +114,8 @@
     @apply rounded-2xl border backdrop-blur-xl;
     background: hsl(var(--glass-bg));
     border-color: hsl(var(--glass-border));
-    box-shadow: 0 8px 32px hsl(var(--glass-shadow)),
-                0 1px 2px hsl(0 0% 0% / 0.04);
+    box-shadow: 0 4px 24px hsl(var(--glass-shadow)),
+                0 1px 2px hsl(0 0% 0% / 0.03);
   }
 
   .gradient-text {
