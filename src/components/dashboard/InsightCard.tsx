@@ -3,7 +3,7 @@ import type { InsightCard } from "@/lib/mockInsights";
 import type { DynamicInsight } from "@/lib/generateInsights";
 
 type InsightProps = InsightCard | DynamicInsight;
-export function InsightCardComponent({ insight }: { insight: InsightCard }) {
+export function InsightCardComponent({ insight }: { insight: InsightProps }) {
   const Icon = insight.icon;
   const ChangeIcon =
     insight.changeType === "up" ? TrendingUp : insight.changeType === "down" ? TrendingDown : Minus;
