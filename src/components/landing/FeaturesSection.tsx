@@ -4,57 +4,54 @@ import { Link2, MessageSquareText, Zap, BarChart3, Bell, Shield } from "lucide-r
 const features = [
   {
     icon: <Link2 className="w-5 h-5" />,
-    title: "Connect in one click",
-    description: "GA4, Shopify, Meta Ads, Stripe — link your tools and see unified data in seconds. No code, no consultants.",
+    title: "One-click connections",
+    description: "GA4, Shopify, Meta Ads, Stripe — link your tools and see unified data in seconds.",
   },
   {
     icon: <MessageSquareText className="w-5 h-5" />,
-    title: "Ask questions, get answers",
-    description: "Type 'Why did my revenue drop?' and get a clear, data-backed explanation — not another chart to decode.",
+    title: "Natural language queries",
+    description: "Ask 'Why did my revenue drop?' and get a clear, sourced answer — not another chart.",
   },
   {
     icon: <Zap className="w-5 h-5" />,
-    title: "Instant action items",
-    description: "Every insight comes with a concrete next step. Know exactly what to do and why it matters.",
+    title: "Actionable recommendations",
+    description: "Every insight includes a concrete next step. Know what to do and why it matters.",
   },
   {
     icon: <Bell className="w-5 h-5" />,
-    title: "Proactive alerts",
-    description: "Don't wait to discover problems. DataBrief flags anomalies and opportunities the moment they appear.",
+    title: "Proactive anomaly alerts",
+    description: "DataBrief flags problems and opportunities the moment they appear — before you notice.",
   },
   {
     icon: <BarChart3 className="w-5 h-5" />,
-    title: "Metrics that matter",
-    description: "Stop drowning in data. See only the KPIs that move your business — sessions, revenue, ROAS, and more.",
+    title: "KPIs that matter",
+    description: "Cut through the noise. See sessions, revenue, ROAS, and the metrics that move your business.",
   },
   {
     icon: <Shield className="w-5 h-5" />,
     title: "Enterprise-grade security",
-    description: "Your data stays yours. SOC 2 compliant infrastructure with end-to-end encryption and granular access controls.",
+    description: "SOC 2 compliant, end-to-end encryption, and granular access controls. Your data stays yours.",
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section className="py-24">
+    <section className="py-24 sm:py-28 bg-secondary/50">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="text-center mb-16"
+          className="mb-16 max-w-xl"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm font-semibold text-primary mb-3 tracking-wide uppercase">Features</p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
-            Everything you need to understand your data
+          <p className="text-xs font-semibold text-accent mb-3 tracking-[0.15em] uppercase font-sans">Features</p>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground font-sans">
+            Built for people who run businesses, not SQL queries
           </h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Built for business owners who want answers, not a degree in analytics.
-          </p>
         </motion.div>
 
-        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -62,13 +59,13 @@ const FeaturesSection = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
+              transition={{ duration: 0.4, delay: i * 0.06 }}
             >
-              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-accent-foreground">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                 {feature.icon}
               </div>
-              <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+              <h3 className="text-base font-semibold text-foreground font-sans">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed font-sans">{feature.description}</p>
             </motion.div>
           ))}
         </div>

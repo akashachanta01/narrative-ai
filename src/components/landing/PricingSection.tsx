@@ -38,21 +38,21 @@ const plans = [
 
 const PricingSection = () => {
   return (
-    <section className="py-24">
+    <section className="py-24 sm:py-28 bg-secondary/50">
       <div className="container px-6 max-w-4xl mx-auto">
         <motion.div
-          className="text-center mb-16"
+          className="mb-16 max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm font-semibold text-primary mb-3 tracking-wide uppercase">Pricing</p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
-            Simple, transparent pricing
+          <p className="text-xs font-semibold text-accent mb-3 tracking-[0.15em] uppercase font-sans">Pricing</p>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground font-sans">
+            Simple, honest pricing
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Start free. Upgrade when you're ready. No surprises.
+          <p className="text-base text-muted-foreground font-sans">
+            Start free. Upgrade when you're ready. Cancel anytime.
           </p>
         </motion.div>
 
@@ -62,7 +62,7 @@ const PricingSection = () => {
               key={i}
               className={`rounded-xl border p-8 space-y-6 ${
                 plan.highlighted
-                  ? "border-primary bg-card shadow-md relative"
+                  ? "border-accent bg-card shadow-md relative"
                   : "border-border bg-card"
               }`}
               initial={{ opacity: 0, y: 24 }}
@@ -71,24 +71,24 @@ const PricingSection = () => {
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               {plan.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium font-sans">
                   Most popular
                 </div>
               )}
 
               <div>
-                <p className="text-sm font-semibold text-foreground mb-1">{plan.name}</p>
+                <p className="text-sm font-semibold text-foreground mb-1 font-sans">{plan.name}</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                  <span className="text-muted-foreground text-sm">{plan.period}</span>
+                  <span className="text-4xl font-bold text-foreground font-sans">{plan.price}</span>
+                  <span className="text-muted-foreground text-sm font-sans">{plan.period}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
+                <p className="text-sm text-muted-foreground mt-2 font-sans">{plan.description}</p>
               </div>
 
               <div className="space-y-3">
                 {plan.features.map((feature, j) => (
-                  <div key={j} className="flex items-center gap-2.5 text-sm">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
+                  <div key={j} className="flex items-center gap-2.5 text-sm font-sans">
+                    <Check className="w-4 h-4 text-accent shrink-0" />
                     <span className="text-foreground">{feature}</span>
                   </div>
                 ))}
@@ -97,7 +97,7 @@ const PricingSection = () => {
               <Button
                 variant={plan.highlighted ? "default" : "outline"}
                 size="lg"
-                className="w-full h-11 rounded-lg text-sm"
+                className={`w-full h-11 rounded-lg text-sm font-sans ${plan.highlighted ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
                 asChild
               >
                 <Link to="/auth">{plan.cta}</Link>
@@ -106,8 +106,8 @@ const PricingSection = () => {
           ))}
         </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          14-day free trial on Growth · No credit card required · Cancel anytime
+        <p className="text-center text-sm text-muted-foreground mt-8 font-sans">
+          14-day free trial on Growth · No credit card required
         </p>
       </div>
     </section>

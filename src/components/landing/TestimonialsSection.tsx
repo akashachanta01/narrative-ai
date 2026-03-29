@@ -14,7 +14,7 @@ const testimonials = [
     initials: "MR",
   },
   {
-    quote: "The AI insights caught a traffic drop from a broken UTM tag that would have taken us weeks to notice. Paid for itself day one.",
+    quote: "The AI insights caught a traffic drop from a broken UTM that would've taken us weeks to notice. Paid for itself day one.",
     name: "Priya Patel",
     role: "Marketing Lead, Freshly",
     initials: "PP",
@@ -23,22 +23,19 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-24">
+    <section className="py-24 sm:py-28">
       <div className="container px-6 max-w-5xl mx-auto">
         <motion.div
-          className="text-center mb-16"
+          className="mb-16 max-w-xl"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm font-semibold text-primary mb-3 tracking-wide uppercase">Testimonials</p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-foreground">
-            Loved by teams who hate dashboards
+          <p className="text-xs font-semibold text-accent mb-3 tracking-[0.15em] uppercase font-sans">What people say</p>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground font-sans">
+            Trusted by teams who'd rather act than analyze
           </h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            See why hundreds of businesses switched to DataBrief.
-          </p>
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -51,14 +48,14 @@ const TestimonialsSection = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
-              <p className="text-sm text-foreground leading-relaxed mb-6">"{t.quote}"</p>
+              <p className="text-sm text-foreground leading-relaxed mb-6 font-sans">"{t.quote}"</p>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                <div className="w-9 h-9 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold font-sans">
                   {t.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
+                  <p className="text-sm font-semibold text-foreground font-sans">{t.name}</p>
+                  <p className="text-xs text-muted-foreground font-sans">{t.role}</p>
                 </div>
               </div>
             </motion.div>
