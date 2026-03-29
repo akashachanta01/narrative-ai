@@ -12,6 +12,7 @@ export interface DynamicInsight {
   changeType: "up" | "down" | "neutral";
   narrative: string;
   source: string;
+  sparkline: number[];
 }
 
 export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
@@ -35,6 +36,9 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
     ? Math.round(((secondSessions - firstSessions) / firstSessions) * 100)
     : 0;
 
+  // Daily sparkline data
+  const dailySessions = dates.map((d) => byDate[d]);
+
   // 1. Total Sessions insight
   insights.push({
     id: "sessions",
@@ -52,6 +56,7 @@ export function generateInsights(summary: WindsorSummary): DynamicInsight[] {
           : "Traffic has been steady throughout the week."
     }`,
     source: "Google Analytics",
+    sparkline: dailySessions,
   });
 
   // 2. Top Source insight
