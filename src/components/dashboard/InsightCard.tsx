@@ -1,6 +1,7 @@
 import { TrendingUp, TrendingDown, Minus, ArrowRight } from "lucide-react";
 import type { InsightCard } from "@/lib/mockInsights";
 import type { DynamicInsight } from "@/lib/generateInsights";
+import { Sparkline } from "./Sparkline";
 
 type InsightProps = InsightCard | DynamicInsight;
 
@@ -9,9 +10,10 @@ export function InsightCardComponent({ insight }: { insight: InsightProps }) {
   const ChangeIcon =
     insight.changeType === "up" ? TrendingUp : insight.changeType === "down" ? TrendingDown : Minus;
 
+  const sparklineData = "sparkline" in insight ? insight.sparkline : undefined;
+
   return (
     <div className="group relative rounded-2xl border border-border/60 bg-card p-6 space-y-4 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-default">
-      {/* Subtle gradient accent on hover */}
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br from-primary/[0.02] to-transparent" />
 
       <div className="relative">
@@ -26,17 +28,24 @@ export function InsightCardComponent({ insight }: { insight: InsightProps }) {
               <p className="text-2xl font-bold text-foreground tracking-tight">{insight.value}</p>
             </div>
           </div>
-          <div
-            className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
-              insight.changeType === "up"
-                ? "bg-green-500/10 text-green-600"
-                : insight.changeType === "down"
-                  ? "bg-red-500/10 text-red-600"
-                  : "bg-muted text-muted-foreground"
-            }`}
-          >
-            <ChangeIcon className="w-3 h-3" />
-            {insight.change}
+
+          <div className="flex items-center gap-3">
+            {/* Sparkline */}
+            {sparklineData && sparklineData.length > 1 && (
+              <Sparkline data={sparklineData} width={72} height={28} />
+            )}
+            <div
+              className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
+                insight.changeType === "up"
+                  ? "bg-green-500/10 text-green-600"
+                  : insight.changeType === "down"
+                    ? "bg-red-500/10 text-red-600"
+                    : "bg-muted text-muted-foreground"
+              }`}
+            >
+              <ChangeIcon className="w-3 h-3" />
+              {insight.change}
+            </div>
           </div>
         </div>
 
