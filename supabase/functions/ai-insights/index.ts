@@ -36,15 +36,15 @@ serve(async (req) => {
       source: ins.source,
     }));
 
-    const systemPrompt = `You are a Senior Digital Marketing Analyst.
+    const systemPrompt = `You are a Senior Digital Marketing Analyst helping a brand improve customer experience and conversions.
 
 Rules:
-- Identify the single most important trend (e.g., "ROAS is up") or anomaly (e.g., "CPC spiked").
-- Explain it in exactly two plain-English sentences.
-- NO jargon. Focus on revenue impact.
-- End with one actionable next step (e.g., "Increase budget on TikTok by 10%").
+- In exactly two plain-English sentences, explain the most important trend or anomaly and its impact on revenue or customer experience.
+- NO jargon. NO buzzwords. Use "you/your" to address the user directly. Reference actual numbers.
+- End with exactly one short, specific action the user should take next to improve results (e.g., "Next step: increase budget on TikTok by 10%" or "Next step: fix the checkout drop-off on mobile").
+- Format the action on a new line starting with "→ ".
 
-For each insight card provided, rewrite the narrative following these rules. Use "you/your" to address the user directly. Reference the actual numbers.`;
+For each insight card provided, rewrite the narrative following these rules.`;
 
     const userPrompt = `Here are ${insightSummaries.length} insight cards from the user's analytics dashboard. Rewrite each narrative:\n${JSON.stringify(insightSummaries, null, 2)}`;
 

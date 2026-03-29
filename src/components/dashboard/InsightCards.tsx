@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { TrendingUp, TrendingDown, Minus, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Sparkles, RefreshCw } from "lucide-react";
 import type { WindsorSummary } from "@/lib/windsorTypes";
 import { generateInsights, type DynamicInsight } from "@/lib/generateInsights";
 import { useAiInsights } from "@/hooks/useAiInsights";
@@ -99,32 +99,19 @@ function InsightCard({
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-semibold text-muted-foreground bg-muted/60 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
-              {insight.source}
-            </span>
-            {aiNarrative && (
-              <span className="text-[10px] font-semibold text-primary/70 bg-primary/5 backdrop-blur-sm px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-0.5">
-                <Sparkles className="w-2.5 h-2.5" />
-                AI
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={onRegenerate}
-              disabled={aiLoading}
-              title="Regenerate insight"
-            >
-              <RefreshCw className={`w-3 h-3 ${aiLoading ? "animate-spin" : ""}`} />
-            </Button>
-            <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-              Explore <ArrowRight className="w-3 h-3" />
-            </span>
-          </div>
+          <span className="text-[10px] font-semibold text-muted-foreground bg-muted/60 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
+            {insight.source}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={onRegenerate}
+            disabled={aiLoading}
+            title="Regenerate insight"
+          >
+            <RefreshCw className={`w-3 h-3 ${aiLoading ? "animate-spin" : ""}`} />
+          </Button>
         </div>
       </div>
     </div>
