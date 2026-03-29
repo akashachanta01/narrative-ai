@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, MessageSquare, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle background */}
       <div className="absolute inset-0 hero-glow" />
 
       <div className="container relative z-10 px-6 py-20 sm:py-28 max-w-5xl mx-auto">
@@ -49,19 +48,16 @@ const HeroSection = () => {
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row gap-3 justify-center mb-4"
+          className="flex justify-center mb-4"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.22 }}
         >
-          <Button size="lg" className="text-base px-8 h-12 rounded-lg" asChild>
+          <Button size="lg" className="text-base px-10 h-12 rounded-lg" asChild>
             <Link to="/auth">
-              Try It Free
+              Get Started Free
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
-          </Button>
-          <Button variant="outline" size="lg" className="text-base px-8 h-12 rounded-lg">
-            Book a Demo
           </Button>
         </motion.div>
 
@@ -74,20 +70,20 @@ const HeroSection = () => {
           Free-forever plan available · Setup in 2 minutes
         </motion.p>
 
-        {/* Product preview mockup */}
+        {/* Rich dashboard preview — inspired by DataFast */}
         <motion.div
-          className="relative max-w-3xl mx-auto"
+          className="relative max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
         >
-          <div className="rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+          <div className="rounded-xl border border-border bg-card shadow-xl overflow-hidden">
             {/* Browser chrome */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/40">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-border" />
-                <div className="w-3 h-3 rounded-full bg-border" />
-                <div className="w-3 h-3 rounded-full bg-border" />
+                <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
+                <div className="w-3 h-3 rounded-full bg-emerald-400/60" />
               </div>
               <div className="flex-1 flex justify-center">
                 <div className="px-4 py-1 rounded-md bg-background text-xs text-muted-foreground border border-border">
@@ -96,49 +92,119 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Fake dashboard content */}
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Good morning, Sarah</p>
-                  <p className="text-sm font-semibold text-foreground">Here's what happened overnight</p>
+            {/* Dashboard toolbar */}
+            <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-border/50">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs font-bold text-primary">D</span>
                 </div>
-                <div className="text-xs px-3 py-1 rounded-full bg-accent text-accent-foreground font-medium">
-                  3 new insights
-                </div>
+                <span className="text-sm font-semibold text-foreground">My Store</span>
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground px-3 py-1.5 rounded-md border border-border bg-background">Last 30 days</span>
+                <span className="text-xs text-muted-foreground px-3 py-1.5 rounded-md border border-border bg-background">Daily</span>
+              </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: "Sessions", value: "12.4K", change: "+18%", positive: true, icon: BarChart3 },
-                  { label: "Conversions", value: "342", change: "+7%", positive: true, icon: Zap },
-                  { label: "Bounce Rate", value: "34%", change: "+3%", positive: false, icon: MessageSquare },
-                ].map((stat, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-muted/50 border border-border/50">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <stat.icon className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{stat.label}</span>
-                    </div>
-                    <p className="text-lg font-semibold text-foreground">{stat.value}</p>
-                    <span className={`text-xs font-medium ${stat.positive ? "text-emerald-600" : "text-red-500"}`}>
-                      {stat.change}
-                    </span>
-                  </div>
+            {/* Metrics ribbon */}
+            <div className="px-6 py-4 grid grid-cols-3 sm:grid-cols-6 gap-4 border-b border-border/30">
+              {[
+                { label: "Visitors", value: "24.8K", change: "+12.4%", up: true },
+                { label: "Revenue", value: "$18,240", change: "+8.2%", up: true },
+                { label: "Conv. Rate", value: "3.2%", change: "+0.4%", up: true },
+                { label: "Rev/Visitor", value: "$0.74", change: "-5.1%", up: false },
+                { label: "Bounce Rate", value: "38%", change: "-2.1%", up: true },
+                { label: "Avg. Session", value: "4m 12s", change: "+18%", up: true },
+              ].map((m, i) => (
+                <div key={i} className="text-center sm:text-left">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">{m.label}</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground leading-tight">{m.value}</p>
+                  <p className={`text-[10px] font-medium ${m.up ? "text-emerald-500" : "text-destructive"}`}>
+                    {m.change} {m.up ? "↑" : "↓"}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Chart area */}
+            <div className="px-6 py-5">
+              <div className="h-36 sm:h-44 relative">
+                {/* Y-axis labels */}
+                <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[9px] text-muted-foreground pr-2">
+                  <span>800</span>
+                  <span>600</span>
+                  <span>400</span>
+                  <span>200</span>
+                  <span>0</span>
+                </div>
+                {/* Grid lines */}
+                <div className="ml-6 h-full flex flex-col justify-between">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <div key={i} className="border-t border-border/40 w-full" />
+                  ))}
+                </div>
+                {/* Line chart SVG */}
+                <svg className="absolute inset-0 ml-6" viewBox="0 0 600 160" preserveAspectRatio="none" fill="none">
+                  <defs>
+                    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(220 65% 48%)" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="hsl(220 65% 48%)" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  {/* Area fill */}
+                  <path
+                    d="M0,120 C30,110 60,95 100,80 C140,65 170,90 220,60 C270,30 310,45 360,35 C410,25 440,55 480,40 C520,25 560,15 600,20 L600,160 L0,160Z"
+                    fill="url(#chartFill)"
+                  />
+                  {/* Line */}
+                  <path
+                    d="M0,120 C30,110 60,95 100,80 C140,65 170,90 220,60 C270,30 310,45 360,35 C410,25 440,55 480,40 C520,25 560,15 600,20"
+                    stroke="hsl(220 65% 48%)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                  {/* Revenue bars */}
+                  {[50, 130, 200, 280, 350, 420, 490, 560].map((x, i) => {
+                    const heights = [30, 55, 40, 70, 45, 60, 75, 50];
+                    return (
+                      <rect
+                        key={i}
+                        x={x - 8}
+                        y={160 - heights[i]}
+                        width="16"
+                        rx="3"
+                        height={heights[i]}
+                        fill="hsl(25 90% 55%)"
+                        opacity="0.7"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+              {/* X-axis labels */}
+              <div className="ml-6 flex justify-between mt-2 text-[9px] text-muted-foreground">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                  <span key={d}>{d}</span>
                 ))}
               </div>
+            </div>
 
-              <div className="p-4 rounded-lg border border-primary/20 bg-primary/5">
-                <p className="text-xs font-medium text-primary mb-1">💡 Insight</p>
-                <p className="text-sm text-foreground leading-relaxed">
-                  Your blog post "10 Tips for Better Email Open Rates" drove 40% of new sessions this week.
-                  Consider creating a follow-up piece to capture related search traffic.
-                </p>
+            {/* AI Insight bar at bottom */}
+            <div className="px-6 pb-5">
+              <div className="p-3.5 rounded-lg border border-primary/20 bg-primary/5 flex items-start gap-3">
+                <span className="text-base mt-0.5">💡</span>
+                <div>
+                  <p className="text-xs font-semibold text-primary mb-0.5">AI Insight</p>
+                  <p className="text-xs text-foreground leading-relaxed">
+                    Your Instagram campaign drove 40% of new visitors this week. Revenue per visitor from that channel is 2.3× higher than average — consider increasing ad spend there.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Decorative glow behind the card */}
-          <div className="absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-b from-primary/5 to-transparent blur-2xl" />
+          {/* Decorative glow */}
+          <div className="absolute -inset-6 -z-10 rounded-2xl bg-gradient-to-b from-primary/5 to-transparent blur-2xl" />
         </motion.div>
       </div>
     </section>
