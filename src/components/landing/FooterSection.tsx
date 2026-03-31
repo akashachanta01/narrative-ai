@@ -6,7 +6,7 @@ const FooterSection = () => {
       <div className="container px-6 max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 font-sans">
           <div className="flex items-center gap-2">
-            <img src={databriefLogo} alt="DataBrief" className="w-5 h-5" />
+            <img src={databriefLogo} alt="DataBrief" className="w-7 h-7" />
             <span className="text-sm font-medium text-foreground">DataBrief</span>
           </div>
 

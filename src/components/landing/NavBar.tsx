@@ -7,7 +7,7 @@ const NavBar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 backdrop-blur-lg bg-background/90">
       <div className="container px-6 max-w-6xl mx-auto flex items-center justify-between h-14">
         <div className="flex items-center gap-2.5">
-          <img src={databriefLogo} alt="DataBrief" className="w-6 h-6" />
+          <img src={databriefLogo} alt="DataBrief" className="w-8 h-8" />
           <span className="text-base font-semibold tracking-tight text-foreground font-sans">DataBrief</span>
         </div>
 
