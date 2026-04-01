@@ -316,9 +316,9 @@ export default function DataBriefDashboard() {
           color: T.textPrimary,
           fontFamily: T.font,
           minHeight: "100vh",
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "0 16px 40px",
+          maxWidth: "100%",
+          margin: 0,
+          padding: "0 24px 40px",
         }}
       >
         {/* ─ Top bar ─ */}
