@@ -9,6 +9,7 @@ import Auth from "./pages/Auth.tsx";
 import Connections from "./pages/Connections.tsx";
 import WindsorSetup from "./pages/WindsorSetup.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import DataBriefDashboard from "./pages/DataBriefDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/connections" element={<Connections />} />
             <Route path="/connections/windsor" element={<WindsorSetup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/brief" element={<DataBriefDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
