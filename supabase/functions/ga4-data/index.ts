@@ -58,7 +58,7 @@ serve(async (req) => {
     // Get GA4 connection
     const { data: connection } = await userClient
       .from("user_connections")
-      .select("access_token, refresh_token, token_expires_at")
+      .select("access_token, refresh_token, token_expires_at, metadata")
       .eq("user_id", user.id)
       .eq("provider", "ga4")
       .eq("status", "active")
@@ -97,34 +97,40 @@ serve(async (req) => {
         .eq("provider", "ga4");
     }
 
-    // First, get the user's GA4 properties
-    const accountsRes = await fetch(
-      "https://analyticsadmin.googleapis.com/v1beta/accountSummaries",
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    let propertyId = "";
+    let propertyName = "Google Analytics 4";
 
-    if (!accountsRes.ok) {
-      const errText = await accountsRes.text();
-      console.error("GA4 accounts error:", accountsRes.status, errText);
-      return new Response(JSON.stringify({ error: "ga4_api_error", message: "Failed to fetch GA4 accounts" }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (connection.metadata && (connection.metadata as any).ga4_property_id) {
+      propertyId = String((connection.metadata as any).ga4_property_id).replace("properties/", "");
+    } else {
+      const accountsRes = await fetch(
+        "https://analyticsadmin.googleapis.com/v1beta/accountSummaries",
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      if (!accountsRes.ok) {
+        const errText = await accountsRes.text();
+        console.error("GA4 accounts error:", accountsRes.status, errText);
+        return new Response(JSON.stringify({ error: "ga4_api_error", message: "Failed to fetch GA4 accounts" }), {
+          status: 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const accountsData = await accountsRes.json();
+      const propertySummaries = accountsData.accountSummaries?.flatMap(
+        (a: any) => a.propertySummaries || []
+      ) || [];
+
+      if (propertySummaries.length === 0) {
+        return new Response(JSON.stringify({ data: [], message: "No GA4 properties found" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      propertyId = propertySummaries[0].property.replace("properties/", "");
+      propertyName = propertySummaries[0].displayName;
     }
-
-    const accountsData = await accountsRes.json();
-    const propertySummaries = accountsData.accountSummaries?.flatMap(
-      (a: any) => a.propertySummaries || []
-    ) || [];
-
-    if (propertySummaries.length === 0) {
-      return new Response(JSON.stringify({ data: [], message: "No GA4 properties found" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Use the first property
-    const propertyId = propertySummaries[0].property.replace("properties/", "");
 
     // Parse days from query string
     const url = new URL(req.url);
@@ -175,7 +181,7 @@ serve(async (req) => {
       spend: 0,
     }));
 
-    return new Response(JSON.stringify({ data: rows, property: propertySummaries[0].displayName }), {
+    return new Response(JSON.stringify({ data: rows, property: propertyName }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
