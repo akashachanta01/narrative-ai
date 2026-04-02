@@ -101,8 +101,7 @@ export default function Connections() {
     const ga4Connected = searchParams.get("ga4_connected");
     const ga4Error = searchParams.get("ga4_error");
     if (ga4Connected === "true") {
-      toast({ title: "Google OAuth success!", description: "Now enter your GA4 Property ID below." });
-      setCardStates(prev => ({ ...prev, ga4: "direct" }));
+      toast({ title: "Google Analytics connected!", description: "Data will appear on your dashboard." });
       setSearchParams({});
       fetchRows();
     } else if (ga4Error) {
