@@ -408,7 +408,7 @@ function SourceCard({
             const ok = await onUpsert("windsor", key, {});
             if (ok) toast({ title: `${source.name} connected via Windsor!`, description: "Data is now flowing." });
           }}
-          onCancel={() => onSetState("choose")}
+        onCancel={() => onSetState("idle")}
           onError={(msg) => { onSetState("error"); }}
         />
       )}
