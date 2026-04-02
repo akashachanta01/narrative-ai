@@ -372,7 +372,23 @@ function SourceCard({
         </div>
       )}
 
-
+      {/* Windsor form */}
+      {state === "windsor" && (
+        <WindsorForm
+          sourceName={source.name}
+          sourceId={source.id}
+          existingKey={existingWindsorKey}
+          onSave={async (key) => {
+            const ok = await onUpsert("windsor", key, {});
+            if (ok) toast({ title: `${source.name} connected via Windsor!`, description: "Data is now flowing." });
+          }}
+          onCancel={() => onSetState("idle")}
+          onError={(msg) => { onSetState("error"); }}
+        />
+      )}
+    </div>
+  );
+}
 
 /* ─── Windsor Form ─── */
 function WindsorForm({
