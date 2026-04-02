@@ -647,12 +647,6 @@ function WindsorForm({
       setTesting(false);
     }
   };
-    } catch {
-      onError(`Could not connect ${sourceName} via Windsor. Check your API key.`);
-    } finally {
-      setTesting(false);
-    }
-  };
 
   return (
     <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
