@@ -164,8 +164,9 @@ serve(async (req) => {
     const reportData = await reportRes.json();
 
     // Transform into our common data model
+    // GA4 returns dates in YYYYMMDD format — convert to YYYY-MM-DD for downstream parsing
     const rows = (reportData.rows || []).map((row: any) => ({
-      date: row.dimensionValues[0].value,
+      date: row.dimensionValues[0].value.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3"),
       source: row.dimensionValues[1].value,
       sessions: parseInt(row.metricValues[0].value) || 0,
       conversions: parseInt(row.metricValues[1].value) || 0,
