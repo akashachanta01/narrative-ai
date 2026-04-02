@@ -249,16 +249,43 @@ const PULSE_CSS = `
 
 /* ─── Main component ─── */
 export default function DataBriefDashboard() {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [dbLoaded, setDbLoaded] = useState(false);
   const [active, setActive] = useState<Record<ConnectorId, boolean>>({
-    ga4: true,
-    shopify: true,
-    stripe: true,
+    ga4: false,
+    shopify: false,
+    stripe: false,
     meta: false,
     klaviyo: false,
     qb: false,
   });
 
   const [toast, setToast] = useState<string | null>(null);
+
+  /* Load connected sources from database */
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) { navigate("/auth"); return; }
+
+    supabase
+      .from("user_connections")
+      .select("provider, status")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const connected: Record<string, boolean> = {};
+          CONNECTORS.forEach(c => { connected[c.id] = false; });
+          data.forEach(row => {
+            if ((row.status === "active" || row.status === "connected") && row.provider in connected) {
+              connected[row.provider] = true;
+            }
+          });
+          setActive(connected as Record<ConnectorId, boolean>);
+        }
+        setDbLoaded(true);
+      });
+  }, [user, authLoading, navigate]);
 
   const h = useCallback((id: ConnectorId) => active[id], [active]);
   const G = h("ga4"), SH = h("shopify"), ST = h("stripe"), M = h("meta"), K = h("klaviyo"), QB = h("qb");
@@ -283,17 +310,12 @@ export default function DataBriefDashboard() {
   };
 
   const connectOne = (id: ConnectorId) => {
-    if (active[id]) return;
-    setActive((p) => ({ ...p, [id]: true }));
-    const c = CONNECTORS.find((x) => x.id === id)!;
-    showToast(`✓ ${c.full} connected — new insights unlocked`);
+    // Navigate to connections page to set up a real connection
+    navigate("/connections");
   };
 
   const connectAll = () => {
-    const next: Record<string, boolean> = {};
-    CONNECTORS.forEach((c) => (next[c.id] = true));
-    setActive(next as Record<ConnectorId, boolean>);
-    showToast("✓ All sources connected");
+    navigate("/connections");
   };
 
   /* Verdict */
