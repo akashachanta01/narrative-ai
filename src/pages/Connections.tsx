@@ -372,7 +372,7 @@ function SourceCard({
             </>
           )}
           {state === "idle" && (
-            <Button variant="default" size="sm" className="h-7 px-3 text-[11px] font-semibold" onClick={() => onSetState("choose")}>
+          <Button variant="default" size="sm" className="h-7 px-3 text-[11px] font-semibold" onClick={() => onSetState("windsor")}>
               Connect
             </Button>
           )}
