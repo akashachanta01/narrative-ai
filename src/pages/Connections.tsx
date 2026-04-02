@@ -277,7 +277,6 @@ function SourceCard({
   onSetState,
   onDisconnect,
   onUpsert,
-  onGA4OAuth,
 }: {
   source: SourceConfig;
   state: CardState;
@@ -287,7 +286,6 @@ function SourceCard({
   onSetState: (s: CardState) => void;
   onDisconnect: () => void;
   onUpsert: (method: string, key: string, meta: Record<string, unknown>) => Promise<boolean>;
-  onGA4OAuth: () => void;
 }) {
   const Icon = source.icon;
   const isConnected = state === "connected";
