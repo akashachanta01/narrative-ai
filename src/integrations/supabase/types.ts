@@ -17,9 +17,11 @@ export type Database = {
       user_connections: {
         Row: {
           access_token: string | null
-          api_key: string
+          api_key: string | null
           created_at: string
           id: string
+          metadata: Json | null
+          method: string | null
           provider: string
           refresh_token: string | null
           status: string
@@ -29,9 +31,11 @@ export type Database = {
         }
         Insert: {
           access_token?: string | null
-          api_key: string
+          api_key?: string | null
           created_at?: string
           id?: string
+          metadata?: Json | null
+          method?: string | null
           provider: string
           refresh_token?: string | null
           status?: string
@@ -41,9 +45,11 @@ export type Database = {
         }
         Update: {
           access_token?: string | null
-          api_key?: string
+          api_key?: string | null
           created_at?: string
           id?: string
+          metadata?: Json | null
+          method?: string | null
           provider?: string
           refresh_token?: string | null
           status?: string

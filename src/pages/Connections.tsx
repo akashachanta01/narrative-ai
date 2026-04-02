@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,26 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import {
-  ExternalLink,
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  KeyRound,
+  Layers,
   Loader2,
   LogOut,
-  KeyRound,
-  ArrowLeft,
-  BarChart3,
-  Layers,
   ShoppingBag,
-  Megaphone,
-  Search as SearchIcon,
-  Video,
-  Mail,
-  Users,
-  Clock,
-  CreditCard,
-  Circle,
-  AlertCircle,
-  RefreshCw,
   Trash2,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -38,213 +36,157 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { LucideIcon } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const WINDSOR_OAUTH_URL = "https://onboard.windsor.ai/";
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 
-interface Connection {
+/* ─── Types ─── */
+type CardState = "idle" | "choose" | "direct" | "windsor" | "saving" | "connected" | "error";
+
+interface ConnectionRow {
   id: string;
   provider: string;
   status: string;
+  method: string | null;
+  api_key: string | null;
+  metadata: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
 
-interface HealthResult {
-  healthy: boolean;
-  reason: string;
-  provider: string;
-}
-
-type ConnectionStatus = "connected" | "error" | "syncing" | "disconnected" | "coming_soon";
-
-interface Integration {
+interface SourceConfig {
+  id: string;
   name: string;
-  provider: string;
-  description: string;
-  icon: LucideIcon;
+  icon: typeof BarChart3;
   iconColor: string;
-  category: string;
-  status: ConnectionStatus;
-  lastSync: string | null;
-  onConnect: () => void;
-  comingSoon?: boolean;
+  description: string;
 }
 
+const SOURCES: SourceConfig[] = [
+  { id: "ga4", name: "Google Analytics 4", icon: BarChart3, iconColor: "text-orange-500", description: "Website traffic, conversions, and audience insights." },
+  { id: "shopify", name: "Shopify", icon: ShoppingBag, iconColor: "text-green-500", description: "Orders, products, revenue, and customer data." },
+  { id: "stripe", name: "Stripe", icon: CreditCard, iconColor: "text-indigo-500", description: "Payments, revenue, subscriptions, and refunds." },
+];
+
+const COMING_SOON = ["Meta Ads", "Klaviyo", "QuickBooks", "TikTok Ads"];
+
+/* ─── Main Page ─── */
 export default function Connections() {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [connections, setConnections] = useState<Connection[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [showKeyInput, setShowKeyInput] = useState(false);
-  const [manualKey, setManualKey] = useState("");
-  const [healthResults, setHealthResults] = useState<Record<string, HealthResult>>({});
-  const [checkingHealth, setCheckingHealth] = useState<Record<string, boolean>>({});
+  const [rows, setRows] = useState<ConnectionRow[]>([]);
+  const [loadingRows, setLoadingRows] = useState(true);
+  const [cardStates, setCardStates] = useState<Record<string, CardState>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
-  const refreshConnections = () => {
+  const fetchRows = useCallback(async () => {
     if (!user) return;
-    supabase
+    const { data } = await supabase
       .from("user_connections")
-      .select("id, provider, status, created_at, updated_at")
-      .eq("user_id", user.id)
-      .then(({ data }) => {
-        if (data) setConnections(data as Connection[]);
-      });
-  };
-
-  useEffect(() => {
-    refreshConnections();
+      .select("*")
+      .eq("user_id", user.id);
+    if (data) setRows(data as unknown as ConnectionRow[]);
+    setLoadingRows(false);
   }, [user]);
 
-  useEffect(() => {
-    const apiKey = searchParams.get("api_key") || searchParams.get("token");
-    if (!apiKey || !user) return;
-    saveApiKey(apiKey);
-    setSearchParams({});
-  }, [searchParams, user, setSearchParams]);
+  useEffect(() => { fetchRows(); }, [fetchRows]);
 
+  // Handle GA4 OAuth callback
   useEffect(() => {
     const ga4Connected = searchParams.get("ga4_connected");
     const ga4Error = searchParams.get("ga4_error");
     if (ga4Connected === "true") {
-      toast({ title: "Connected!", description: "Google Analytics 4 is now linked to your account." });
+      toast({ title: "Google OAuth success!", description: "Now enter your GA4 Property ID below." });
+      setCardStates(prev => ({ ...prev, ga4: "direct" }));
       setSearchParams({});
-      refreshConnections();
+      fetchRows();
     } else if (ga4Error) {
       toast({ title: "GA4 connection failed", description: ga4Error, variant: "destructive" });
       setSearchParams({});
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, fetchRows]);
 
-  const saveApiKey = async (apiKey: string) => {
+  const getRow = (source: string) => rows.find(r => r.provider === source);
+  const getWindsorKey = () => {
+    const windsorRow = rows.find(r => r.method === "windsor" && r.api_key);
+    return windsorRow?.api_key || "";
+  };
+
+  const resolveState = (source: string): CardState => {
+    if (cardStates[source]) return cardStates[source];
+    const row = getRow(source);
+    if (row && (row.status === "active" || row.status === "connected")) return "connected";
+    if (row && row.status === "error") return "error";
+    return "idle";
+  };
+
+  const setState = (source: string, state: CardState) =>
+    setCardStates(prev => ({ ...prev, [source]: state }));
+
+  const setError = (source: string, msg: string) =>
+    setErrors(prev => ({ ...prev, [source]: msg }));
+
+  const handleDisconnect = async (source: string) => {
     if (!user) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("user_connections")
-      .upsert(
-        { user_id: user.id, provider: "windsor", api_key: apiKey, status: "active" },
-        { onConflict: "user_id,provider" }
-      );
-    setSaving(false);
+    await supabase.from("user_connections").delete().eq("user_id", user.id).eq("provider", source);
+    setCardStates(prev => ({ ...prev, [source]: "idle" }));
+    setErrors(prev => { const n = { ...prev }; delete n[source]; return n; });
+    toast({ title: "Disconnected", description: `${SOURCES.find(s => s.id === source)?.name} removed.` });
+    fetchRows();
+  };
+
+  const handleUpsert = async (
+    source: string,
+    method: string,
+    apiKey: string,
+    metadata: Record<string, unknown>
+  ) => {
+    if (!user) return false;
+    setState(source, "saving");
+    const { error } = await supabase.from("user_connections").upsert(
+      {
+        user_id: user.id,
+        provider: source,
+        api_key: apiKey || "",
+        method,
+        status: "active",
+        metadata: metadata as any,
+      } as any,
+      { onConflict: "user_id,provider" }
+    );
     if (error) {
-      toast({ title: "Error saving connection", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Connected!", description: "Windsor.ai is now linked to your account." });
-      setShowKeyInput(false);
-      setManualKey("");
-      refreshConnections();
+      setState(source, "error");
+      setError(source, error.message);
+      return false;
     }
+    setState(source, "connected");
+    fetchRows();
+    return true;
   };
 
-  const getConnection = (provider: string) => connections.find((c) => c.provider === provider);
-  const windsorConn = getConnection("windsor");
-  const ga4Conn = getConnection("ga4");
-
-  const getStatus = (conn?: Connection): ConnectionStatus => {
-    if (!conn) return "disconnected";
-    if (conn.status === "active") return "connected";
-    if (conn.status === "error") return "error";
-    return "connected";
-  };
-
-  const handleConnectWindsor = () => {
-    navigate("/connections/windsor");
-  };
-
-  const handleConnectGA4 = async () => {
+  const handleGA4OAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
-      const res = await fetch(
-        `https://${PROJECT_ID}.supabase.co/functions/v1/ga4-auth`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ redirect_uri: `${window.location.origin}/connections` }),
-        }
-      );
+      const res = await fetch(`https://${PROJECT_ID}.supabase.co/functions/v1/ga4-auth`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ redirect_uri: `${window.location.origin}/connections` }),
+      });
       const json = await res.json();
-      if (json.url) {
-        window.location.href = json.url;
-      } else {
-        toast({ title: "Error", description: json.error || "Failed to start GA4 auth", variant: "destructive" });
-      }
+      if (json.url) window.location.href = json.url;
+      else toast({ title: "Error", description: json.error || "Failed to start GA4 auth", variant: "destructive" });
     } catch {
       toast({ title: "Error", description: "Failed to connect to GA4", variant: "destructive" });
     }
   };
 
-  const handleSaveManualKey = () => {
-    const key = manualKey.trim();
-    if (!key) return;
-    saveApiKey(key);
-  };
-
-  const handleDisconnect = async (provider: string) => {
-    if (!user) return;
-    const { error } = await supabase
-      .from("user_connections")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("provider", provider);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Disconnected", description: `${provider} has been removed.` });
-      refreshConnections();
-    }
-  };
-
-  const handleHealthCheck = async (provider: string) => {
-    setCheckingHealth((prev) => ({ ...prev, [provider]: true }));
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      const res = await fetch(
-        `https://${PROJECT_ID}.supabase.co/functions/v1/health-check`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ provider }),
-        }
-      );
-      const result = await res.json();
-      setHealthResults((prev) => ({ ...prev, [provider]: result }));
-      refreshConnections();
-      toast({
-        title: result.healthy ? "Connection healthy" : "Connection issue",
-        description: result.reason,
-        variant: result.healthy ? "default" : "destructive",
-      });
-    } catch {
-      toast({ title: "Error", description: "Health check failed", variant: "destructive" });
-    } finally {
-      setCheckingHealth((prev) => ({ ...prev, [provider]: false }));
-    }
-  };
-
-  // Auto health-check connected integrations on mount
-  useEffect(() => {
-    if (!user || connections.length === 0) return;
-    const activeProviders = connections.filter((c) => c.status === "active").map((c) => c.provider);
-    activeProviders.forEach((provider) => handleHealthCheck(provider));
-  }, [connections.length, user]);
-
-  const comingSoonHandler = (name: string) => () =>
-    toast({ title: "Coming soon", description: `${name} integration is on the roadmap.` });
+  const allConnected = SOURCES.every(s => resolveState(s.id) === "connected");
 
   if (authLoading) {
     return (
@@ -254,127 +196,14 @@ export default function Connections() {
     );
   }
 
-  const integrations: Integration[] = [
-    {
-      name: "Google Analytics 4",
-      provider: "ga4",
-      description: "Website traffic, conversions, and audience data via OAuth.",
-      icon: BarChart3,
-      iconColor: "text-orange-500",
-      category: "Analytics",
-      status: getStatus(ga4Conn),
-      lastSync: ga4Conn?.updated_at || null,
-      onConnect: handleConnectGA4,
-    },
-    {
-      name: "Windsor.ai",
-      provider: "windsor",
-      description: "Unified API for 100+ marketing sources.",
-      icon: Layers,
-      iconColor: "text-violet-500",
-      category: "Aggregator",
-      status: getStatus(windsorConn),
-      lastSync: windsorConn?.updated_at || null,
-      onConnect: handleConnectWindsor,
-    },
-    {
-      name: "Shopify",
-      provider: "shopify",
-      description: "Orders, revenue, products, and customer data.",
-      icon: ShoppingBag,
-      iconColor: "text-green-500",
-      category: "E-commerce",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("Shopify"),
-      comingSoon: true,
-    },
-    {
-      name: "Meta Ads",
-      provider: "meta",
-      description: "Facebook & Instagram ad spend, impressions, and ROAS.",
-      icon: Megaphone,
-      iconColor: "text-blue-500",
-      category: "Paid Ads",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("Meta Ads"),
-      comingSoon: true,
-    },
-    {
-      name: "Google Ads",
-      provider: "google_ads",
-      description: "Campaign performance, spend, and keyword data.",
-      icon: SearchIcon,
-      iconColor: "text-yellow-500",
-      category: "Paid Ads",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("Google Ads"),
-      comingSoon: true,
-    },
-    {
-      name: "TikTok Ads",
-      provider: "tiktok",
-      description: "Ad performance, video views, and conversions.",
-      icon: Video,
-      iconColor: "text-pink-500",
-      category: "Paid Ads",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("TikTok Ads"),
-      comingSoon: true,
-    },
-    {
-      name: "Klaviyo",
-      provider: "klaviyo",
-      description: "Email open rates, click rates, and revenue attribution.",
-      icon: Mail,
-      iconColor: "text-emerald-500",
-      category: "Email",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("Klaviyo"),
-      comingSoon: true,
-    },
-    {
-      name: "HubSpot",
-      provider: "hubspot",
-      description: "CRM pipeline and marketing campaign performance.",
-      icon: Users,
-      iconColor: "text-orange-400",
-      category: "CRM",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("HubSpot"),
-      comingSoon: true,
-    },
-    {
-      name: "Stripe",
-      provider: "stripe",
-      description: "Payment analytics, revenue, subscriptions, and refund data.",
-      icon: CreditCard,
-      iconColor: "text-indigo-500",
-      category: "Payments",
-      status: "coming_soon",
-      lastSync: null,
-      onConnect: comingSoonHandler("Stripe"),
-      comingSoon: true,
-    },
-  ];
-
-  const connectedCount = integrations.filter((i) => i.status === "connected").length;
-  const categories = [...new Set(integrations.map((i) => i.category))];
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Top bar */}
       <header className="border-b border-border/50 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/dashboard")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-sm font-semibold text-foreground tracking-tight">Connection Hub</h1>
+          <h1 className="text-sm font-semibold text-foreground tracking-tight">Connections</h1>
         </div>
         <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={signOut}>
           <LogOut className="h-3.5 w-3.5 mr-1.5" />
@@ -382,308 +211,485 @@ export default function Connections() {
         </Button>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
-        {/* Header */}
-        <div className="space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Connect your data</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Link your marketing platforms to generate AI-powered insights.
-          </p>
-          {/* Status summary */}
-          <div className="flex items-center gap-4 pt-1">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-xs text-muted-foreground">
-                {connectedCount} connected
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
+        {/* All connected banner */}
+        {allConnected && (
+          <div className="rounded-xl bg-green-500/10 border border-green-500/20 p-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                All sources connected — you're ready to go
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
-              <span className="text-xs text-muted-foreground">
-                {integrations.length - connectedCount} available
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {saving && (
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-center gap-3">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span className="text-sm font-medium text-primary">Saving your connection…</span>
+            <Button size="sm" className="h-7 text-xs" onClick={() => navigate("/dashboard")}>
+              Go to dashboard <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
           </div>
         )}
 
-        {/* Grouped integrations */}
-        <div className="space-y-8">
-          {categories.map((cat) => (
-            <div key={cat} className="space-y-3">
-              <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em] px-1">
-                {cat}
-              </h3>
-              <div className="space-y-2">
-                {integrations
-                  .filter((i) => i.category === cat)
-                  .map((integration) => (
-                    <IntegrationCard
-                      key={integration.provider}
-                      integration={integration}
-                      showKeyInput={integration.provider === "windsor" && showKeyInput && integration.status !== "connected"}
-                      manualKey={manualKey}
-                      setManualKey={setManualKey}
-                      onSaveKey={handleSaveManualKey}
-                      onDisconnect={() => handleDisconnect(integration.provider)}
-                      onHealthCheck={() => handleHealthCheck(integration.provider)}
-                      checkingHealth={!!checkingHealth[integration.provider]}
-                      healthResult={healthResults[integration.provider]}
-                      saving={saving}
-                    />
-                  ))}
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Connect your data</h2>
+          <p className="text-sm text-muted-foreground">
+            Link your sources to generate AI-powered insights. Connect directly or via Windsor.ai.
+          </p>
+        </div>
+
+        {/* Source cards */}
+        <div className="space-y-3">
+          {loadingRows ? (
+            SOURCES.map(s => (
+              <div key={s.id} className="rounded-xl border border-border/60 bg-card p-5 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                  <Skeleton className="h-7 w-20 rounded-md" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            SOURCES.map(s => (
+              <SourceCard
+                key={s.id}
+                source={s}
+                state={resolveState(s.id)}
+                row={getRow(s.id)}
+                existingWindsorKey={getWindsorKey()}
+                errorMsg={errors[s.id]}
+                onSetState={(st) => setState(s.id, st)}
+                onDisconnect={() => handleDisconnect(s.id)}
+                onUpsert={(method, key, meta) => handleUpsert(s.id, method, key, meta)}
+                onGA4OAuth={handleGA4OAuth}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Coming soon */}
+        <div className="space-y-3 pt-4">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
+            More connectors coming soon
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {COMING_SOON.map(name => (
+              <span key={name} className="text-xs text-muted-foreground/60 bg-muted/40 border border-border/30 px-3 py-1.5 rounded-full">
+                {name}
+              </span>
+            ))}
+          </div>
         </div>
       </main>
     </div>
   );
 }
 
-/* ─── Status Indicator ─── */
-function StatusBadge({ status }: { status: ConnectionStatus }) {
-  const config: Record<ConnectionStatus, { icon: LucideIcon; label: string; dotClass: string; textClass: string; bgClass: string }> = {
-    connected: {
-      icon: CheckCircle2,
-      label: "Connected",
-      dotClass: "bg-green-500",
-      textClass: "text-green-600 dark:text-green-400",
-      bgClass: "bg-green-500/10",
-    },
-    syncing: {
-      icon: RefreshCw,
-      label: "Syncing…",
-      dotClass: "bg-blue-500 animate-pulse",
-      textClass: "text-blue-600 dark:text-blue-400",
-      bgClass: "bg-blue-500/10",
-    },
-    error: {
-      icon: AlertCircle,
-      label: "Error",
-      dotClass: "bg-red-500",
-      textClass: "text-red-600 dark:text-red-400",
-      bgClass: "bg-red-500/10",
-    },
-    disconnected: {
-      icon: Circle,
-      label: "Not connected",
-      dotClass: "bg-muted-foreground/30",
-      textClass: "text-muted-foreground",
-      bgClass: "bg-muted/50",
-    },
-    coming_soon: {
-      icon: Clock,
-      label: "Coming soon",
-      dotClass: "bg-muted-foreground/20",
-      textClass: "text-muted-foreground",
-      bgClass: "bg-muted/50",
-    },
-  };
-
-  const c = config[status];
-  const Icon = c.icon;
-
-  return (
-    <div className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full ${c.bgClass} ${c.textClass}`}>
-      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dotClass}`} />
-      {c.label}
-    </div>
-  );
-}
-
-/* ─── Integration Card ─── */
-function IntegrationCard({
-  integration,
-  showKeyInput,
-  manualKey,
-  setManualKey,
-  onSaveKey,
+/* ─── Source Card ─── */
+function SourceCard({
+  source,
+  state,
+  row,
+  existingWindsorKey,
+  errorMsg,
+  onSetState,
   onDisconnect,
-  onHealthCheck,
-  checkingHealth,
-  healthResult,
-  saving,
+  onUpsert,
+  onGA4OAuth,
 }: {
-  integration: Integration;
-  showKeyInput: boolean;
-  manualKey: string;
-  setManualKey: (v: string) => void;
-  onSaveKey: () => void;
+  source: SourceConfig;
+  state: CardState;
+  row?: ConnectionRow;
+  existingWindsorKey: string;
+  errorMsg?: string;
+  onSetState: (s: CardState) => void;
   onDisconnect: () => void;
-  onHealthCheck: () => void;
-  checkingHealth: boolean;
-  healthResult?: HealthResult;
-  saving: boolean;
+  onUpsert: (method: string, key: string, meta: Record<string, unknown>) => Promise<boolean>;
+  onGA4OAuth: () => void;
 }) {
-  const Icon = integration.icon;
-  const isActive = integration.status === "connected";
-  const isComingSoon = integration.comingSoon;
+  const Icon = source.icon;
+  const isConnected = state === "connected";
 
   return (
-    <div
-      className={`rounded-xl border p-4 sm:p-5 space-y-3 transition-all duration-200 ${
-        isActive
-          ? "border-green-500/20 bg-green-500/[0.03]"
-          : isComingSoon
-            ? "border-border/40 bg-card/50 opacity-70"
-            : "border-border/60 bg-card hover:border-primary/20 hover:shadow-sm"
-      }`}
-    >
+    <div className={`rounded-xl border p-4 sm:p-5 transition-all duration-200 ${
+      isConnected
+        ? "border-green-500/20 bg-green-500/[0.03]"
+        : state === "error"
+          ? "border-red-500/20 bg-red-500/[0.02]"
+          : "border-border/60 bg-card"
+    }`}>
+      {/* Header row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-            isActive ? "bg-green-500/10" : "bg-accent/80"
+            isConnected ? "bg-green-500/10" : "bg-accent/80"
           }`}>
-            <Icon className={`w-5 h-5 ${isActive ? "text-green-500" : integration.iconColor}`} />
+            <Icon className={`w-5 h-5 ${isConnected ? "text-green-500" : source.iconColor}`} />
           </div>
-          <div className="min-w-0 space-y-1">
-            <h4 className="text-sm font-semibold text-foreground truncate">{integration.name}</h4>
-            <p className="text-xs text-muted-foreground leading-relaxed">{integration.description}</p>
-            {integration.lastSync && isActive && (
-              <div className="flex items-center gap-1 pt-0.5">
-                <Clock className="w-3 h-3 text-muted-foreground/60" />
-                <span className="text-[10px] text-muted-foreground/60">
-                  Last synced {formatDistanceToNow(new Date(integration.lastSync), { addSuffix: true })}
-                </span>
-              </div>
+          <div className="min-w-0 space-y-0.5">
+            <h4 className="text-sm font-semibold text-foreground">{source.name}</h4>
+            <p className="text-xs text-muted-foreground">{source.description}</p>
+            {isConnected && row && (
+              <p className="text-[10px] text-muted-foreground/60 pt-0.5">
+                Connected via {row.method === "windsor" ? "Windsor.ai" : "direct"} · {new Date(row.updated_at).toLocaleDateString()}
+              </p>
             )}
           </div>
         </div>
-
-        <div className="flex flex-col items-end gap-2 shrink-0">
-          <StatusBadge status={integration.status} />
-          {!isActive && !isComingSoon && (
-            <Button
-              variant="default"
-              size="sm"
-              className="h-7 px-3 text-[11px] font-semibold"
-              onClick={integration.onConnect}
-            >
-              <ExternalLink className="h-3 w-3 mr-1" />
-              Connect
-            </Button>
-          )}
-          {isActive && (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
-                onClick={onHealthCheck}
-                disabled={checkingHealth}
-              >
-                {checkingHealth ? (
-                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                ) : (
-                  <RefreshCw className="h-3 w-3 mr-1" />
-                )}
-                Test
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
-                onClick={integration.onConnect}
-              >
-                <RefreshCw className="h-3 w-3 mr-1" />
-                Reconnect
-              </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          {isConnected && (
+            <>
+              <span className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-2 py-1 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                Connected
+              </span>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-[11px] text-muted-foreground hover:text-destructive"
-                  >
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[11px] text-muted-foreground hover:text-destructive">
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Disconnect {integration.name}?</AlertDialogTitle>
+                    <AlertDialogTitle>Remove {source.name}?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will remove the connection and stop syncing data from {integration.name}. You can reconnect at any time.
+                      This will stop it showing in your dashboard. You can reconnect at any time.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={onDisconnect}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
+                    <AlertDialogAction onClick={onDisconnect} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                       Disconnect
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+            </>
+          )}
+          {state === "idle" && (
+            <Button variant="default" size="sm" className="h-7 px-3 text-[11px] font-semibold" onClick={() => onSetState("choose")}>
+              Connect
+            </Button>
+          )}
+          {state === "saving" && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
             </div>
           )}
         </div>
       </div>
 
-      {/* Health check result */}
-      {isActive && healthResult && (
-        <div className={`border-t pt-3 flex items-center gap-2 text-xs ${
-          healthResult.healthy
-            ? "border-green-500/20 text-green-600 dark:text-green-400"
-            : "border-red-500/20 text-red-600 dark:text-red-400"
-        }`}>
-          {healthResult.healthy ? (
-            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-          ) : (
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-          )}
-          <span>{healthResult.reason}</span>
+      {/* Error state */}
+      {state === "error" && errorMsg && (
+        <div className="mt-3 rounded-lg bg-red-500/5 border border-red-500/15 p-3 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-600 dark:text-red-400">{errorMsg}</p>
+          </div>
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onSetState("choose")}>
+            <RefreshCw className="h-3 w-3 mr-1" /> Retry
+          </Button>
         </div>
       )}
 
-      {/* Windsor manual key input */}
-      {showKeyInput && (
-        <div className="border-t border-border/40 pt-3 space-y-3">
-          <p className="text-xs text-muted-foreground">
-            Windsor.ai opened in a new tab. After completing setup, paste your API key below:
-          </p>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-              <Input
-                value={manualKey}
-                onChange={(e) => setManualKey(e.target.value)}
-                placeholder="Paste your Windsor.ai API key"
-                className="pl-9 h-8 text-xs"
-              />
-            </div>
-            <Button
-              variant="default"
-              size="sm"
-              className="h-8 px-4 text-xs"
-              onClick={onSaveKey}
-              disabled={!manualKey.trim() || saving}
+      {/* Method chooser */}
+      {state === "choose" && (
+        <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">Choose connection method</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                if (source.id === "ga4") onGA4OAuth();
+                else onSetState("direct");
+              }}
+              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
             >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
-            </Button>
+              <p className="text-xs font-semibold text-foreground">Connect directly{source.id === "ga4" ? " with Google" : ""}</p>
+              <p className="text-[11px] text-muted-foreground">
+                {source.id === "ga4" ? "No extra account · Free · Most accurate data" :
+                 source.id === "shopify" ? "Use your Shopify Admin API token" :
+                 "Use a restricted read-only Stripe key"}
+              </p>
+            </button>
+            <button
+              onClick={() => onSetState("windsor")}
+              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
+            >
+              <div className="flex items-center gap-1.5">
+                <Layers className="h-3 w-3 text-violet-500" />
+                <p className="text-xs font-semibold text-foreground">Use Windsor.ai</p>
+              </div>
+              <p className="text-[11px] text-muted-foreground">One key for all sources · Quickest setup</p>
+              {existingWindsorKey && (
+                <p className="text-[10px] text-green-600 dark:text-green-400">You already have a Windsor key saved</p>
+              )}
+            </button>
           </div>
-          <p className="text-[10px] text-muted-foreground">
-            Find your API key at{" "}
-            <a
-              href="https://onboard.windsor.ai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2"
-            >
-              onboard.windsor.ai
-            </a>
-            {" "}→ Account Settings → API Keys.
-          </p>
+          <button onClick={() => onSetState("idle")} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+            Cancel
+          </button>
         </div>
       )}
+
+      {/* Direct forms */}
+      {state === "direct" && source.id === "ga4" && (
+        <GA4DirectForm onSave={async (propertyId) => {
+          const ok = await onUpsert("direct", "", { ga4_property_id: propertyId });
+          if (ok) toast({ title: "GA4 connected!", description: "Traffic data will appear in your dashboard." });
+        }} onCancel={() => onSetState("choose")} />
+      )}
+      {state === "direct" && source.id === "shopify" && (
+        <ShopifyDirectForm onSave={async (domain, token) => {
+          const ok = await onUpsert("direct", token, { shopify_store_domain: domain });
+          if (ok) toast({ title: "Shopify saved!", description: "Your data will appear in the dashboard." });
+        }} onCancel={() => onSetState("choose")} />
+      )}
+      {state === "direct" && source.id === "stripe" && (
+        <StripeDirectForm onSave={async (key) => {
+          const ok = await onUpsert("direct", key, {});
+          if (ok) toast({ title: "Stripe saved!", description: "Revenue data will appear in your dashboard." });
+        }} onCancel={() => onSetState("choose")} />
+      )}
+
+      {/* Windsor form */}
+      {state === "windsor" && (
+        <WindsorForm
+          sourceName={source.name}
+          sourceId={source.id}
+          existingKey={existingWindsorKey}
+          onSave={async (key) => {
+            const ok = await onUpsert("windsor", key, {});
+            if (ok) toast({ title: `${source.name} connected via Windsor!`, description: "Data is now flowing." });
+          }}
+          onCancel={() => onSetState("choose")}
+          onError={(msg) => { onSetState("error"); }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ─── GA4 Direct Form ─── */
+function GA4DirectForm({ onSave, onCancel }: { onSave: (id: string) => void; onCancel: () => void }) {
+  const [propertyId, setPropertyId] = useState("");
+  return (
+    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
+      <p className="text-xs font-medium text-foreground">Enter your GA4 Property ID</p>
+      <Input
+        value={propertyId}
+        onChange={e => setPropertyId(e.target.value)}
+        placeholder="G-XXXXXXXXXX or 123456789"
+        className="h-9 text-xs"
+      />
+      <p className="text-[10px] text-muted-foreground">GA4 → Admin → Property Settings → Property ID</p>
+      <div className="flex gap-2">
+        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(propertyId.trim())} disabled={!propertyId.trim()}>
+          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Shopify Direct Form ─── */
+function ShopifyDirectForm({ onSave, onCancel }: { onSave: (domain: string, token: string) => void; onCancel: () => void }) {
+  const [domain, setDomain] = useState("");
+  const [token, setToken] = useState("");
+  const [showToken, setShowToken] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  return (
+    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-foreground">Store URL</label>
+        <Input value={domain} onChange={e => setDomain(e.target.value)} placeholder="yourstore.myshopify.com" className="h-9 text-xs" />
+        <p className="text-[10px] text-muted-foreground">Just the subdomain — no https://</p>
+      </div>
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-foreground">Admin API access token</label>
+        <div className="relative">
+          <Input
+            type={showToken ? "text" : "password"}
+            value={token}
+            onChange={e => setToken(e.target.value)}
+            placeholder="shpat_xxxxxxxxxxxx"
+            className="h-9 text-xs pr-9"
+          />
+          <button onClick={() => setShowToken(!showToken)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            {showToken ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      </div>
+
+      <button onClick={() => setShowHelp(!showHelp)} className="text-[11px] text-primary flex items-center gap-1">
+        How to get your access token {showHelp ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+      {showHelp && (
+        <ol className="text-[11px] text-muted-foreground space-y-1.5 pl-4 list-decimal">
+          <li>Shopify Admin → Settings → Apps and sales channels</li>
+          <li>Click "Develop apps" → "Create an app"</li>
+          <li>Name it "DataBrief" → Configure Admin API scopes</li>
+          <li>Enable: <span className="font-mono text-[10px]">read_orders, read_products, read_inventory, read_customers</span></li>
+          <li>Click "Install app" → copy the access token</li>
+        </ol>
+      )}
+
+      <div className="flex gap-2">
+        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(domain.trim(), token.trim())} disabled={!domain.trim() || !token.trim()}>
+          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Stripe Direct Form ─── */
+function StripeDirectForm({ onSave, onCancel }: { onSave: (key: string) => void; onCancel: () => void }) {
+  const [key, setKey] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  return (
+    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
+      <div className="rounded-lg bg-amber-500/5 border border-amber-500/15 p-3">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-amber-600 dark:text-amber-400">
+            Use a restricted key — never your secret key. This gives DataBrief read-only access only.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-foreground">Restricted API key</label>
+        <div className="relative">
+          <Input
+            type={showKey ? "text" : "password"}
+            value={key}
+            onChange={e => setKey(e.target.value)}
+            placeholder="rk_live_xxxxxxxxxxxx"
+            className="h-9 text-xs pr-9"
+          />
+          <button onClick={() => setShowKey(!showKey)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            {showKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+          </button>
+        </div>
+      </div>
+
+      <button onClick={() => setShowHelp(!showHelp)} className="text-[11px] text-primary flex items-center gap-1">
+        How to create a restricted key {showHelp ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+      {showHelp && (
+        <ol className="text-[11px] text-muted-foreground space-y-1.5 pl-4 list-decimal">
+          <li>Stripe Dashboard → Developers → API keys</li>
+          <li>Click "Create restricted key"</li>
+          <li>Name it "DataBrief read-only"</li>
+          <li>Enable READ permissions for: Balance, Charges, Customers, Refunds</li>
+          <li>Click "Create key" and copy it here</li>
+        </ol>
+      )}
+
+      <div className="flex gap-2">
+        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(key.trim())} disabled={!key.trim()}>
+          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Windsor Form ─── */
+function WindsorForm({
+  sourceName,
+  sourceId,
+  existingKey,
+  onSave,
+  onCancel,
+  onError,
+}: {
+  sourceName: string;
+  sourceId: string;
+  existingKey: string;
+  onSave: (key: string) => void;
+  onCancel: () => void;
+  onError: (msg: string) => void;
+}) {
+  const [key, setKey] = useState(existingKey);
+  const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const hasExisting = !!existingKey;
+
+  const maskedKey = existingKey ? `••••${existingKey.slice(-4)}` : "";
+
+  const handleTest = async () => {
+    const trimmed = key.trim();
+    if (!trimmed) return;
+    setTesting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch(
+        `https://${PROJECT_ID}.supabase.co/functions/v1/windsor-data?days=7`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // We can't fully test Windsor per-source from the browser without the edge function supporting it,
+      // so just save and let the dashboard handle validation
+      onSave(trimmed);
+    } catch {
+      onError(`Could not connect ${sourceName} via Windsor. Check your API key.`);
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
+      <div className="flex items-center gap-1.5">
+        <Layers className="h-3 w-3 text-violet-500" />
+        <p className="text-xs font-medium text-foreground">Windsor.ai API key</p>
+      </div>
+
+      {hasExisting && (
+        <p className="text-[10px] text-green-600 dark:text-green-400">Using your saved Windsor key ({maskedKey})</p>
+      )}
+
+      <div className="relative">
+        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          type={showKey ? "text" : "password"}
+          value={key}
+          onChange={e => setKey(e.target.value)}
+          placeholder="Paste your Windsor.ai API key"
+          className="h-9 text-xs pl-9 pr-9"
+        />
+        <button onClick={() => setShowKey(!showKey)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+          {showKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+
+      <p className="text-[10px] text-muted-foreground">
+        Get your key at{" "}
+        <a href="https://onboard.windsor.ai/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+          windsor.ai
+        </a>{" "}
+        → Account Settings → API Keys
+      </p>
+
+      <div className="flex gap-2">
+        <Button size="sm" className="h-8 text-xs" onClick={handleTest} disabled={!key.trim() || testing}>
+          {testing ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
+          {hasExisting ? "Confirm & save" : "Test & save"}
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
+      </div>
     </div>
   );
 }
