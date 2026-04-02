@@ -41,7 +41,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 
 /* ─── Types ─── */
-type CardState = "idle" | "choose" | "direct" | "windsor" | "saving" | "connected" | "error";
+type CardState = "idle" | "windsor" | "saving" | "connected" | "error";
 
 interface ConnectionRow {
   id: string;
