@@ -391,7 +391,7 @@ function SourceCard({
             <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
             <p className="text-xs text-red-600 dark:text-red-400">{errorMsg}</p>
           </div>
-          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onSetState("choose")}>
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onSetState("windsor")}>
             <RefreshCw className="h-3 w-3 mr-1" /> Retry
           </Button>
         </div>
