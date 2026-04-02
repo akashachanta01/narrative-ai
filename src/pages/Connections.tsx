@@ -235,7 +235,7 @@ export default function Connections() {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-foreground tracking-tight">Connect your data</h2>
           <p className="text-sm text-muted-foreground">
-            Link your sources to generate AI-powered insights. Connect directly or via Windsor.ai.
+            Link your sources to generate AI-powered insights via Windsor.ai.
           </p>
         </div>
 
