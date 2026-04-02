@@ -634,20 +634,19 @@ function WindsorForm({
     if (!trimmed) return;
     setTesting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      const res = await fetch(
-        `https://${PROJECT_ID}.supabase.co/functions/v1/windsor-data?days=7`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // We can't fully test Windsor per-source from the browser without the edge function supporting it,
-      // so just save and let the dashboard handle validation
+      const { error } = await supabase.functions.invoke("windsor-data", {
+        body: { source: sourceId, apiKey: trimmed },
+      });
+
+      if (error) throw error;
+
       onSave(trimmed);
+    } catch {
+      onError(`Could not connect ${sourceName} via Windsor. Check your API key.`);
+    } finally {
+      setTesting(false);
+    }
+  };
     } catch {
       onError(`Could not connect ${sourceName} via Windsor. Check your API key.`);
     } finally {
