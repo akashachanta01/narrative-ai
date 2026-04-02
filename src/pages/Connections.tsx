@@ -10,12 +10,9 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
   CreditCard,
   Eye,
   EyeOff,
-  ExternalLink,
   KeyRound,
   Layers,
   Loader2,
@@ -41,7 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 
 /* ─── Types ─── */
-type CardState = "idle" | "choose" | "direct" | "windsor" | "saving" | "connected" | "error";
+type CardState = "idle" | "windsor" | "saving" | "connected" | "error";
 
 interface ConnectionRow {
   id: string;
@@ -101,8 +98,7 @@ export default function Connections() {
     const ga4Connected = searchParams.get("ga4_connected");
     const ga4Error = searchParams.get("ga4_error");
     if (ga4Connected === "true") {
-      toast({ title: "Google OAuth success!", description: "Now enter your GA4 Property ID below." });
-      setCardStates(prev => ({ ...prev, ga4: "direct" }));
+      toast({ title: "Google Analytics connected!", description: "Data will appear on your dashboard." });
       setSearchParams({});
       fetchRows();
     } else if (ga4Error) {
@@ -169,27 +165,6 @@ export default function Connections() {
     return true;
   };
 
-  const handleGA4OAuth = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("ga4-auth", {
-        body: { redirect_uri: `${window.location.origin}/connections` },
-      });
-
-      if (error) {
-        toast({ title: "Error", description: error.message || "Failed to start GA4 auth", variant: "destructive" });
-        return;
-      }
-
-      if (data?.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      toast({ title: "Error", description: data?.error || "Failed to start GA4 auth", variant: "destructive" });
-    } catch {
-      toast({ title: "Error", description: "Failed to connect to GA4", variant: "destructive" });
-    }
-  };
 
   const allConnected = SOURCES.every(s => resolveState(s.id) === "connected");
 
@@ -235,7 +210,7 @@ export default function Connections() {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-foreground tracking-tight">Connect your data</h2>
           <p className="text-sm text-muted-foreground">
-            Link your sources to generate AI-powered insights. Connect directly or via Windsor.ai.
+            Link your sources to generate AI-powered insights via Windsor.ai.
           </p>
         </div>
 
@@ -266,7 +241,6 @@ export default function Connections() {
                 onSetState={(st) => setState(s.id, st)}
                 onDisconnect={() => handleDisconnect(s.id)}
                 onUpsert={(method, key, meta) => handleUpsert(s.id, method, key, meta)}
-                onGA4OAuth={handleGA4OAuth}
               />
             ))
           )}
@@ -300,7 +274,6 @@ function SourceCard({
   onSetState,
   onDisconnect,
   onUpsert,
-  onGA4OAuth,
 }: {
   source: SourceConfig;
   state: CardState;
@@ -310,7 +283,6 @@ function SourceCard({
   onSetState: (s: CardState) => void;
   onDisconnect: () => void;
   onUpsert: (method: string, key: string, meta: Record<string, unknown>) => Promise<boolean>;
-  onGA4OAuth: () => void;
 }) {
   const Icon = source.icon;
   const isConnected = state === "connected";
@@ -372,7 +344,7 @@ function SourceCard({
             </>
           )}
           {state === "idle" && (
-            <Button variant="default" size="sm" className="h-7 px-3 text-[11px] font-semibold" onClick={() => onSetState("choose")}>
+          <Button variant="default" size="sm" className="h-7 px-3 text-[11px] font-semibold" onClick={() => onSetState("windsor")}>
               Connect
             </Button>
           )}
@@ -391,69 +363,10 @@ function SourceCard({
             <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0 mt-0.5" />
             <p className="text-xs text-red-600 dark:text-red-400">{errorMsg}</p>
           </div>
-          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onSetState("choose")}>
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onSetState("windsor")}>
             <RefreshCw className="h-3 w-3 mr-1" /> Retry
           </Button>
         </div>
-      )}
-
-      {/* Method chooser */}
-      {state === "choose" && (
-        <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
-          <p className="text-xs font-medium text-muted-foreground">Choose connection method</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button
-              onClick={() => {
-                if (source.id === "ga4") onGA4OAuth();
-                else onSetState("direct");
-              }}
-              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
-            >
-              <p className="text-xs font-semibold text-foreground">Connect directly{source.id === "ga4" ? " with Google" : ""}</p>
-              <p className="text-[11px] text-muted-foreground">
-                {source.id === "ga4" ? "No extra account · Free · Most accurate data" :
-                 source.id === "shopify" ? "Use your Shopify Admin API token" :
-                 "Use a restricted read-only Stripe key"}
-              </p>
-            </button>
-            <button
-              onClick={() => onSetState("windsor")}
-              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
-            >
-              <div className="flex items-center gap-1.5">
-                <Layers className="h-3 w-3 text-violet-500" />
-                <p className="text-xs font-semibold text-foreground">Use Windsor.ai</p>
-              </div>
-              <p className="text-[11px] text-muted-foreground">One key for all sources · Quickest setup</p>
-              {existingWindsorKey && (
-                <p className="text-[10px] text-green-600 dark:text-green-400">You already have a Windsor key saved</p>
-              )}
-            </button>
-          </div>
-          <button onClick={() => onSetState("idle")} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* Direct forms */}
-      {state === "direct" && source.id === "ga4" && (
-        <GA4DirectForm onSave={async (propertyId) => {
-          const ok = await onUpsert("direct", "", { ga4_property_id: propertyId });
-          if (ok) toast({ title: "GA4 connected!", description: "Traffic data will appear in your dashboard." });
-        }} onCancel={() => onSetState("choose")} />
-      )}
-      {state === "direct" && source.id === "shopify" && (
-        <ShopifyDirectForm onSave={async (domain, token) => {
-          const ok = await onUpsert("direct", token, { shopify_store_domain: domain });
-          if (ok) toast({ title: "Shopify saved!", description: "Your data will appear in the dashboard." });
-        }} onCancel={() => onSetState("choose")} />
-      )}
-      {state === "direct" && source.id === "stripe" && (
-        <StripeDirectForm onSave={async (key) => {
-          const ok = await onUpsert("direct", key, {});
-          if (ok) toast({ title: "Stripe saved!", description: "Revenue data will appear in your dashboard." });
-        }} onCancel={() => onSetState("choose")} />
       )}
 
       {/* Windsor form */}
@@ -466,142 +379,10 @@ function SourceCard({
             const ok = await onUpsert("windsor", key, {});
             if (ok) toast({ title: `${source.name} connected via Windsor!`, description: "Data is now flowing." });
           }}
-          onCancel={() => onSetState("choose")}
+          onCancel={() => onSetState("idle")}
           onError={(msg) => { onSetState("error"); }}
         />
       )}
-    </div>
-  );
-}
-
-/* ─── GA4 Direct Form ─── */
-function GA4DirectForm({ onSave, onCancel }: { onSave: (id: string) => void; onCancel: () => void }) {
-  const [propertyId, setPropertyId] = useState("");
-  return (
-    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
-      <p className="text-xs font-medium text-foreground">Enter your GA4 Property ID</p>
-      <Input
-        value={propertyId}
-        onChange={e => setPropertyId(e.target.value)}
-        placeholder="G-XXXXXXXXXX or 123456789"
-        className="h-9 text-xs"
-      />
-      <p className="text-[10px] text-muted-foreground">GA4 → Admin → Property Settings → Property ID</p>
-      <div className="flex gap-2">
-        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(propertyId.trim())} disabled={!propertyId.trim()}>
-          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Shopify Direct Form ─── */
-function ShopifyDirectForm({ onSave, onCancel }: { onSave: (domain: string, token: string) => void; onCancel: () => void }) {
-  const [domain, setDomain] = useState("");
-  const [token, setToken] = useState("");
-  const [showToken, setShowToken] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-
-  return (
-    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-foreground">Store URL</label>
-        <Input value={domain} onChange={e => setDomain(e.target.value)} placeholder="yourstore.myshopify.com" className="h-9 text-xs" />
-        <p className="text-[10px] text-muted-foreground">Just the subdomain — no https://</p>
-      </div>
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-foreground">Admin API access token</label>
-        <div className="relative">
-          <Input
-            type={showToken ? "text" : "password"}
-            value={token}
-            onChange={e => setToken(e.target.value)}
-            placeholder="shpat_xxxxxxxxxxxx"
-            className="h-9 text-xs pr-9"
-          />
-          <button onClick={() => setShowToken(!showToken)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-            {showToken ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-          </button>
-        </div>
-      </div>
-
-      <button onClick={() => setShowHelp(!showHelp)} className="text-[11px] text-primary flex items-center gap-1">
-        How to get your access token {showHelp ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-      </button>
-      {showHelp && (
-        <ol className="text-[11px] text-muted-foreground space-y-1.5 pl-4 list-decimal">
-          <li>Shopify Admin → Settings → Apps and sales channels</li>
-          <li>Click "Develop apps" → "Create an app"</li>
-          <li>Name it "DataBrief" → Configure Admin API scopes</li>
-          <li>Enable: <span className="font-mono text-[10px]">read_orders, read_products, read_inventory, read_customers</span></li>
-          <li>Click "Install app" → copy the access token</li>
-        </ol>
-      )}
-
-      <div className="flex gap-2">
-        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(domain.trim(), token.trim())} disabled={!domain.trim() || !token.trim()}>
-          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Stripe Direct Form ─── */
-function StripeDirectForm({ onSave, onCancel }: { onSave: (key: string) => void; onCancel: () => void }) {
-  const [key, setKey] = useState("");
-  const [showKey, setShowKey] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-
-  return (
-    <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
-      <div className="rounded-lg bg-amber-500/5 border border-amber-500/15 p-3">
-        <div className="flex items-start gap-2">
-          <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-amber-600 dark:text-amber-400">
-            Use a restricted key — never your secret key. This gives DataBrief read-only access only.
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-xs font-medium text-foreground">Restricted API key</label>
-        <div className="relative">
-          <Input
-            type={showKey ? "text" : "password"}
-            value={key}
-            onChange={e => setKey(e.target.value)}
-            placeholder="rk_live_xxxxxxxxxxxx"
-            className="h-9 text-xs pr-9"
-          />
-          <button onClick={() => setShowKey(!showKey)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-            {showKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-          </button>
-        </div>
-      </div>
-
-      <button onClick={() => setShowHelp(!showHelp)} className="text-[11px] text-primary flex items-center gap-1">
-        How to create a restricted key {showHelp ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-      </button>
-      {showHelp && (
-        <ol className="text-[11px] text-muted-foreground space-y-1.5 pl-4 list-decimal">
-          <li>Stripe Dashboard → Developers → API keys</li>
-          <li>Click "Create restricted key"</li>
-          <li>Name it "DataBrief read-only"</li>
-          <li>Enable READ permissions for: Balance, Charges, Customers, Refunds</li>
-          <li>Click "Create key" and copy it here</li>
-        </ol>
-      )}
-
-      <div className="flex gap-2">
-        <Button size="sm" className="h-8 text-xs" onClick={() => onSave(key.trim())} disabled={!key.trim()}>
-          <CheckCircle2 className="h-3 w-3 mr-1" /> Save
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" onClick={onCancel}>Cancel</Button>
-      </div>
     </div>
   );
 }
