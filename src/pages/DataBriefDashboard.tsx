@@ -317,6 +317,14 @@ export default function DataBriefDashboard() {
   const connectAll = () => {
     navigate("/connections");
   };
+  /* Loading state */
+  if (authLoading || !dbLoaded) {
+    return (
+      <div style={{ background: T.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: T.teal, fontSize: 14, fontFamily: T.font }}>Loading your brief…</div>
+      </div>
+    );
+  }
 
   /* Verdict */
   const verdictKey = getVerdictKey(h);
