@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+
 
 /* ─── Types ─── */
 type CardState = "idle" | "choose" | "direct" | "windsor" | "saving" | "connected" | "error";
