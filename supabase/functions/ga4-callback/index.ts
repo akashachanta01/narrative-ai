@@ -48,17 +48,36 @@ serve(async (req) => {
     const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
-    const userInfo = await userInfoRes.json();
-    await userInfoRes.text().catch(() => {});
 
-    // Find user by email in Supabase
+    if (!userInfoRes.ok) {
+      console.error("userinfo fetch failed:", userInfoRes.status);
+      const redirectUri = state ? decodeURIComponent(state) : "/connections";
+      return Response.redirect(`${redirectUri}?ga4_error=userinfo_failed`, 302);
+    }
+
+    const userInfo = await userInfoRes.json();
+
+    if (!userInfo.email) {
+      const redirectUri = state ? decodeURIComponent(state) : "/connections";
+      return Response.redirect(`${redirectUri}?ga4_error=no_email`, 302);
+    }
+
+    // Find user by email in Supabase — paginate through all users to avoid the 50-user default limit
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // List users and find by email
-    const { data: usersData } = await supabase.auth.admin.listUsers();
-    const matchedUser = usersData?.users?.find((u) => u.email === userInfo.email);
+    let matchedUser = null;
+    let page = 1;
+    const perPage = 1000;
+
+    while (!matchedUser) {
+      const { data: usersData } = await supabase.auth.admin.listUsers({ page, perPage });
+      const users = usersData?.users ?? [];
+      matchedUser = users.find((u) => u.email === userInfo.email) ?? null;
+      if (users.length < perPage) break; // last page
+      page++;
+    }
 
     if (!matchedUser) {
       const redirectUri = state ? decodeURIComponent(state) : "/connections";
