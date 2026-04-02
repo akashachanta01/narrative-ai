@@ -397,64 +397,6 @@ function SourceCard({
         </div>
       )}
 
-      {/* Method chooser */}
-      {state === "choose" && (
-        <div className="mt-4 border-t border-border/40 pt-4 space-y-3">
-          <p className="text-xs font-medium text-muted-foreground">Choose connection method</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button
-              onClick={() => {
-                if (source.id === "ga4") onGA4OAuth();
-                else onSetState("direct");
-              }}
-              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
-            >
-              <p className="text-xs font-semibold text-foreground">Connect directly{source.id === "ga4" ? " with Google" : ""}</p>
-              <p className="text-[11px] text-muted-foreground">
-                {source.id === "ga4" ? "No extra account · Free · Most accurate data" :
-                 source.id === "shopify" ? "Use your Shopify Admin API token" :
-                 "Use a restricted read-only Stripe key"}
-              </p>
-            </button>
-            <button
-              onClick={() => onSetState("windsor")}
-              className="text-left rounded-lg border border-border/60 hover:border-primary/30 bg-card p-3 space-y-1 transition-colors"
-            >
-              <div className="flex items-center gap-1.5">
-                <Layers className="h-3 w-3 text-violet-500" />
-                <p className="text-xs font-semibold text-foreground">Use Windsor.ai</p>
-              </div>
-              <p className="text-[11px] text-muted-foreground">One key for all sources · Quickest setup</p>
-              {existingWindsorKey && (
-                <p className="text-[10px] text-green-600 dark:text-green-400">You already have a Windsor key saved</p>
-              )}
-            </button>
-          </div>
-          <button onClick={() => onSetState("idle")} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
-            Cancel
-          </button>
-        </div>
-      )}
-
-      {/* Direct forms */}
-      {state === "direct" && source.id === "ga4" && (
-        <GA4DirectForm onSave={async (propertyId) => {
-          const ok = await onUpsert("direct", "", { ga4_property_id: propertyId });
-          if (ok) toast({ title: "GA4 connected!", description: "Traffic data will appear in your dashboard." });
-        }} onCancel={() => onSetState("choose")} />
-      )}
-      {state === "direct" && source.id === "shopify" && (
-        <ShopifyDirectForm onSave={async (domain, token) => {
-          const ok = await onUpsert("direct", token, { shopify_store_domain: domain });
-          if (ok) toast({ title: "Shopify saved!", description: "Your data will appear in the dashboard." });
-        }} onCancel={() => onSetState("choose")} />
-      )}
-      {state === "direct" && source.id === "stripe" && (
-        <StripeDirectForm onSave={async (key) => {
-          const ok = await onUpsert("direct", key, {});
-          if (ok) toast({ title: "Stripe saved!", description: "Revenue data will appear in your dashboard." });
-        }} onCancel={() => onSetState("choose")} />
-      )}
 
       {/* Windsor form */}
       {state === "windsor" && (
