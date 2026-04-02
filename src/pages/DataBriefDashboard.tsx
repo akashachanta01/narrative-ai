@@ -317,6 +317,9 @@ export default function DataBriefDashboard() {
   const connectAll = () => {
     navigate("/connections");
   };
+  /* Sections (must be before early return for hooks rules) */
+  const sections = useMemo(() => getSections(h, connectOne), [active]);
+
   /* Loading state */
   if (authLoading || !dbLoaded) {
     return (
@@ -336,9 +339,6 @@ export default function DataBriefDashboard() {
   /* Tiles */
   const tiles = getTiles(h);
   const tileCols = Math.min(tiles.length, 4);
-
-  /* Sections */
-  const sections = useMemo(() => getSections(h, connectOne), [active]);
 
   return (
     <>
