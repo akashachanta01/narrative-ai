@@ -33,7 +33,7 @@ serve(async (req) => {
       client_id: GOOGLE_CLIENT_ID,
       redirect_uri: callbackUrl,
       response_type: "code",
-      scope: "https://www.googleapis.com/auth/analytics.readonly",
+      scope: "https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/userinfo.email openid",
       access_type: "offline",
       prompt: "consent",
       state: encodeURIComponent(redirect_uri),
