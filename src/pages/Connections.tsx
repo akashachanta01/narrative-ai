@@ -244,7 +244,6 @@ export default function Connections() {
                 onSetState={(st) => setState(s.id, st)}
                 onDisconnect={() => handleDisconnect(s.id)}
                 onUpsert={(method, key, meta) => handleUpsert(s.id, method, key, meta)}
-                onGA4OAuth={handleGA4OAuth}
               />
             ))
           )}
