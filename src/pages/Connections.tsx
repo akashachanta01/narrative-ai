@@ -168,27 +168,6 @@ export default function Connections() {
     return true;
   };
 
-  const handleGA4OAuth = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("ga4-auth", {
-        body: { redirect_uri: `${window.location.origin}/connections` },
-      });
-
-      if (error) {
-        toast({ title: "Error", description: error.message || "Failed to start GA4 auth", variant: "destructive" });
-        return;
-      }
-
-      if (data?.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      toast({ title: "Error", description: data?.error || "Failed to start GA4 auth", variant: "destructive" });
-    } catch {
-      toast({ title: "Error", description: "Failed to connect to GA4", variant: "destructive" });
-    }
-  };
 
   const allConnected = SOURCES.every(s => resolveState(s.id) === "connected");
 
