@@ -52,24 +52,38 @@ const PULSE_CSS = `@keyframes dbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 
 
 /* ─── Main ─── */
 export default function DataBriefDashboard() {
+  const DATE_RANGES = [
+    { label: "Last 7 days", days: 7 },
+    { label: "Last 30 days", days: 30 },
+    { label: "Last 90 days", days: 90 },
+  ] as const;
+
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [days, setDays] = useState(7);
 
-  const fetchBrief = useCallback(async () => {
+  const fetchBrief = useCallback(async (d: number = days) => {
     if (!user) return;
     setLoading(true); setError(null);
     try {
-      const { data: fnData, error: fnError } = await supabase.functions.invoke("dashboard-brief", { body: {} });
-      if (fnError) throw fnError;
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/dashboard-brief?days=${d}`,
+        { method: "POST", headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json", apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY }, body: "{}" }
+      );
+      const fnData = await res.json();
+      if (!res.ok) throw new Error(fnData.error || "Failed");
       setData(fnData as DashboardResponse);
     } catch (e: any) {
       console.error("Dashboard brief error:", e);
       setError(e?.message || "Failed to load dashboard");
     } finally { setLoading(false); }
-  }, [user]);
+  }, [user, days]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -95,7 +109,7 @@ export default function DataBriefDashboard() {
         <div style={{ textAlign: "center", maxWidth: 400 }}>
           <div style={{ fontSize: 48, opacity: 0.15, marginBottom: 12 }}>⚠️</div>
           <p style={{ fontSize: 14, color: T.red, marginBottom: 8 }}>{error}</p>
-          <button onClick={fetchBrief} style={{ fontSize: 12, color: T.teal, background: "rgba(0,212,170,0.08)", border: `1px solid rgba(0,212,170,0.2)`, borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontFamily: T.font }}>Try again</button>
+          <button onClick={() => fetchBrief()} style={{ fontSize: 12, color: T.teal, background: "rgba(0,212,170,0.08)", border: `1px solid rgba(0,212,170,0.2)`, borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontFamily: T.font }}>Try again</button>
         </div>
       </div>
     );
@@ -134,7 +148,24 @@ export default function DataBriefDashboard() {
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: T.teal, animation: "dbPulse 2s ease-in-out infinite" }} />
             <span style={{ fontSize: 12, color: T.teal }}>DataBrief AI · your analytics analyst</span>
           </div>
-          <span style={{ fontSize: 11, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 20, padding: "4px 12px" }}>Just now</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {DATE_RANGES.map((r) => (
+              <button
+                key={r.days}
+                onClick={() => { setDays(r.days); fetchBrief(r.days); }}
+                style={{
+                  fontSize: 11, fontFamily: T.font, cursor: "pointer",
+                  padding: "4px 10px", borderRadius: 6,
+                  background: days === r.days ? "rgba(0,212,170,0.12)" : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${days === r.days ? "rgba(0,212,170,0.3)" : T.borderSubtle}`,
+                  color: days === r.days ? T.teal : T.textSecondary,
+                  fontWeight: days === r.days ? 600 : 400,
+                }}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Greeting */}
@@ -309,7 +340,7 @@ export default function DataBriefDashboard() {
 
         {/* Footer */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, paddingTop: 14, borderTop: `1px solid ${T.borderDefault}` }}>
-          <button onClick={fetchBrief} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>↻ Refresh brief</button>
+          <button onClick={() => fetchBrief()} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>↻ Refresh brief</button>
           <button onClick={() => navigate("/connections")} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>Manage connections →</button>
         </div>
       </div>
