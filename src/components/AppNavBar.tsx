@@ -1,13 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Plug, LogOut } from "lucide-react";
+import { LayoutDashboard, Plug, LogOut, BarChart3 } from "lucide-react";
 import databriefLogo from "@/assets/databrief-logo.png";
+
+const ADMIN_EMAIL = "achantaa9@gmail.com";
 
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Connections", path: "/connections", icon: Plug },
 ];
+
+const ADMIN_NAV = { label: "Admin", path: "/admin", icon: BarChart3 };
 
 export default function AppNavBar() {
   const { user, signOut } = useAuth();
