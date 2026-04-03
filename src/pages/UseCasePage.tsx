@@ -63,7 +63,7 @@ const UseCasePage = () => {
             <div className="grid gap-4 sm:grid-cols-2">
               {page.painPoints.map((pain, i) => (
                 <div key={i} className="flex gap-3 p-4 rounded-xl border border-border/50 bg-card">
-                  <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                   <p className="text-sm text-foreground font-sans">{pain}</p>
                 </div>
               ))}

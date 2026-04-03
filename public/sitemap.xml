@@ -5,4 +5,26 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Use-case pages -->
+  <url><loc>https://databrief.ai/for/ecommerce</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/for/saas</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/for/agencies</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/for/startups</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/for/content-creators</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/for/dropshipping</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Metric explainer pages -->
+  <url><loc>https://databrief.ai/learn/what-is-roas</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://databrief.ai/learn/what-is-conversion-rate</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://databrief.ai/learn/what-is-bounce-rate</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://databrief.ai/learn/what-is-cac</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://databrief.ai/learn/what-is-average-order-value</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://databrief.ai/learn/what-is-session-duration</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Comparison pages -->
+  <url><loc>https://databrief.ai/compare/vs-google-analytics</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/compare/vs-looker-studio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/compare/vs-triple-whale</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://databrief.ai/compare/vs-northbeam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

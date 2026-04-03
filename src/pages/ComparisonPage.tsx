@@ -54,7 +54,7 @@ const ComparisonPage = () => {
                 <div className="space-y-3 mb-6">
                   {page.competitorPros.map((pro, i) => (
                     <div key={i} className="flex gap-2 items-start">
-                      <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <Check className="h-4 w-4 text-accent shrink-0 mt-0.5" />
                       <span className="text-sm text-muted-foreground font-sans">{pro}</span>
                     </div>
                   ))}
