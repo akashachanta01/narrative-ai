@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import AppNavBar from "@/components/AppNavBar";
 import { useAuth } from "@/contexts/AuthContext";
 
 /* ─── Types ─── */
