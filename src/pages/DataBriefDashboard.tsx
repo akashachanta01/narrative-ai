@@ -142,7 +142,9 @@ export default function DataBriefDashboard() {
   return (
     <>
       <style>{PULSE_CSS}</style>
-      <div style={{ background: T.bg, color: T.textPrimary, fontFamily: T.font, minHeight: "100vh", maxWidth: "100%", margin: 0, padding: "0 24px 40px" }}>
+      <div style={{ background: T.bg, minHeight: "100vh" }}>
+      <AppNavBar />
+      <div style={{ color: T.textPrimary, fontFamily: T.font, maxWidth: "100%", margin: 0, padding: "0 24px 40px" }}>
         {/* Top bar */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
