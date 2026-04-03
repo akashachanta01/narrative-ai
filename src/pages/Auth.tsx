@@ -33,7 +33,7 @@ export default function Auth() {
     // Check if user has any connections — if not, send to connections page
     const checkConnections = async () => {
       const { data } = await supabase
-        .from("user_connections")
+        .from("user_connections_safe" as any)
         .select("id")
         .eq("user_id", user.id)
         .limit(1);
