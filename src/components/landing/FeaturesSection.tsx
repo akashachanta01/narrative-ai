@@ -1,20 +1,20 @@
 import { motion } from "framer-motion";
-import { Link2, MessageSquareText, Zap, BarChart3, Bell, Shield } from "lucide-react";
+import { Link2, Sparkles, Zap, BarChart3, Bell, Layers } from "lucide-react";
 
 const features = [
   {
     icon: Link2,
-    title: "One-click connections",
-    description: "GA4, Shopify, Meta Ads, Stripe — link your tools and see unified data in seconds.",
+    title: "Windsor.ai integration",
+    description: "Connect GA4, Shopify, and Stripe through Windsor.ai with a single API key. All your marketing data in one place.",
     gradient: "from-blue-500/20 to-blue-500/5",
     iconBg: "bg-blue-500/15",
     iconColor: "text-blue-400",
     borderHover: "hover:border-blue-500/30",
   },
   {
-    icon: MessageSquareText,
-    title: "Natural language queries",
-    description: "Ask 'Why did my revenue drop?' and get a clear, sourced answer — not another chart.",
+    icon: Sparkles,
+    title: "AI-powered briefs",
+    description: "Get a daily AI verdict on your marketing performance — what's working, what's not, and exactly what to do about it.",
     gradient: "from-violet-500/20 to-violet-500/5",
     iconBg: "bg-violet-500/15",
     iconColor: "text-violet-400",
@@ -23,7 +23,7 @@ const features = [
   {
     icon: Zap,
     title: "Actionable recommendations",
-    description: "Every insight includes a concrete next step. Know what to do and why it matters.",
+    description: "Every alert and insight includes a concrete next step. Know what to do and why it matters.",
     gradient: "from-amber-500/20 to-amber-500/5",
     iconBg: "bg-amber-500/15",
     iconColor: "text-amber-400",
@@ -31,8 +31,8 @@ const features = [
   },
   {
     icon: Bell,
-    title: "Proactive anomaly alerts",
-    description: "DataBrief flags problems and opportunities the moment they appear — before you notice.",
+    title: "Smart alerts",
+    description: "DataBrief flags critical drops, warnings, and opportunities the moment they appear in your data.",
     gradient: "from-pink-500/20 to-pink-500/5",
     iconBg: "bg-pink-500/15",
     iconColor: "text-pink-400",
@@ -41,16 +41,16 @@ const features = [
   {
     icon: BarChart3,
     title: "KPIs that matter",
-    description: "Cut through the noise. See sessions, revenue, ROAS, and the metrics that move your business.",
+    description: "Sessions, revenue, ROAS, conversion rate — the metrics that move your business, surfaced automatically.",
     gradient: "from-emerald-500/20 to-emerald-500/5",
     iconBg: "bg-emerald-500/15",
     iconColor: "text-emerald-400",
     borderHover: "hover:border-emerald-500/30",
   },
   {
-    icon: Shield,
-    title: "Enterprise-grade security",
-    description: "SOC 2 compliant, end-to-end encryption, and granular access controls. Your data stays yours.",
+    icon: Layers,
+    title: "Source-aware insights",
+    description: "Dashboard dynamically adapts based on your connected sources — GA4-only or multi-platform, it adjusts automatically.",
     gradient: "from-cyan-500/20 to-cyan-500/5",
     iconBg: "bg-cyan-500/15",
     iconColor: "text-cyan-400",
@@ -93,7 +93,6 @@ const FeaturesSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.07 }}
               >
-                {/* Gradient overlay on hover */}
                 <div
                   className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
                 />
