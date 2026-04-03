@@ -148,7 +148,24 @@ export default function DataBriefDashboard() {
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: T.teal, animation: "dbPulse 2s ease-in-out infinite" }} />
             <span style={{ fontSize: 12, color: T.teal }}>DataBrief AI · your analytics analyst</span>
           </div>
-          <span style={{ fontSize: 11, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 20, padding: "4px 12px" }}>Just now</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {DATE_RANGES.map((r) => (
+              <button
+                key={r.days}
+                onClick={() => { setDays(r.days); fetchBrief(r.days); }}
+                style={{
+                  fontSize: 11, fontFamily: T.font, cursor: "pointer",
+                  padding: "4px 10px", borderRadius: 6,
+                  background: days === r.days ? "rgba(0,212,170,0.12)" : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${days === r.days ? "rgba(0,212,170,0.3)" : T.borderSubtle}`,
+                  color: days === r.days ? T.teal : T.textSecondary,
+                  fontWeight: days === r.days ? 600 : 400,
+                }}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Greeting */}
