@@ -7,17 +7,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function jsonRes(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth
     const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing authorization" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (!authHeader) return jsonRes({ error: "Missing authorization" }, 401);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -26,11 +28,7 @@ serve(async (req) => {
     });
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (authError || !user) return jsonRes({ error: "Unauthorized" }, 401);
 
     // Get user connections
     const { data: connections } = await supabase
@@ -41,18 +39,13 @@ serve(async (req) => {
     const activeConnections = (connections || []).filter(
       (c: any) => c.status === "active" || c.status === "connected"
     );
-
     const connectedSources = activeConnections.map((c: any) => c.provider);
 
     if (connectedSources.length === 0) {
-      return new Response(JSON.stringify({
-        brief: null,
-        connectedSources: [],
-        message: "No sources connected",
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonRes({ brief: null, connectedSources: [], message: "No sources connected" });
     }
 
-    // Fetch Windsor data if any connection has a Windsor key
+    // Fetch Windsor data
     const windsorConn = activeConnections.find((c: any) => c.method === "windsor" && c.api_key);
     let windsorData: any[] = [];
 
@@ -79,15 +72,20 @@ serve(async (req) => {
       }
     }
 
-    // Summarize data
-    const totalSpend = windsorData.reduce((s: number, r: any) => s + (Number(r.spend) || 0), 0);
-    const totalRevenue = windsorData.reduce((s: number, r: any) => s + (Number(r.revenue) || 0), 0);
-    const totalClicks = windsorData.reduce((s: number, r: any) => s + (Number(r.clicks) || 0), 0);
-    const totalSessions = windsorData.reduce((s: number, r: any) => s + (Number(r.sessions) || 0), 0);
-    const totalConversions = windsorData.reduce((s: number, r: any) => s + (Number(r.conversions) || 0), 0);
-    const roas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+    // Aggregate data
+    const totals = windsorData.reduce(
+      (acc, r) => ({
+        spend: acc.spend + (Number(r.spend) || 0),
+        revenue: acc.revenue + (Number(r.revenue) || 0),
+        clicks: acc.clicks + (Number(r.clicks) || 0),
+        sessions: acc.sessions + (Number(r.sessions) || 0),
+        conversions: acc.conversions + (Number(r.conversions) || 0),
+      }),
+      { spend: 0, revenue: 0, clicks: 0, sessions: 0, conversions: 0 }
+    );
 
-    // By source breakdown
+    const roas = totals.spend > 0 ? totals.revenue / totals.spend : 0;
+
     const bySource: Record<string, { revenue: number; spend: number; clicks: number; sessions: number; conversions: number }> = {};
     for (const r of windsorData) {
       const src = r.source || "unknown";
@@ -99,7 +97,6 @@ serve(async (req) => {
       bySource[src].conversions += Number(r.conversions) || 0;
     }
 
-    // By date for trend
     const byDate: Record<string, { revenue: number; sessions: number; conversions: number }> = {};
     for (const r of windsorData) {
       const d = r.date || "unknown";
@@ -109,15 +106,16 @@ serve(async (req) => {
       byDate[d].conversions += Number(r.conversions) || 0;
     }
 
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     const summary = {
-      totalSpend: Math.round(totalSpend * 100) / 100,
-      totalRevenue: Math.round(totalRevenue * 100) / 100,
-      totalClicks,
-      totalSessions,
-      totalConversions,
-      roas: Math.round(roas * 100) / 100,
-      conversionRate: totalSessions > 0 ? Math.round((totalConversions / totalSessions) * 10000) / 100 : 0,
-      avgOrderValue: totalConversions > 0 ? Math.round((totalRevenue / totalConversions) * 100) / 100 : 0,
+      totalSpend: round2(totals.spend),
+      totalRevenue: round2(totals.revenue),
+      totalClicks: totals.clicks,
+      totalSessions: totals.sessions,
+      totalConversions: totals.conversions,
+      roas: round2(roas),
+      conversionRate: totals.sessions > 0 ? round2((totals.conversions / totals.sessions) * 100) : 0,
+      avgOrderValue: totals.conversions > 0 ? round2(totals.revenue / totals.conversions) : 0,
       bySource: Object.entries(bySource)
         .map(([name, data]) => ({ name, ...data }))
         .sort((a, b) => b.revenue - a.revenue),
@@ -126,38 +124,47 @@ serve(async (req) => {
         .sort((a, b) => a.date.localeCompare(b.date)),
     };
 
-    // If no actual data from Windsor, return summary without AI
     if (windsorData.length === 0) {
-      return new Response(JSON.stringify({
-        brief: null,
-        connectedSources,
-        summary,
+      return jsonRes({
+        brief: null, connectedSources, summary,
         message: "Connected but no data returned from Windsor. Make sure your Windsor.ai account has data sources configured.",
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      });
     }
 
-    // Call AI to generate the brief
+    // AI brief generation
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      // Return data without AI brief
-      return new Response(JSON.stringify({
-        brief: null,
-        connectedSources,
-        summary,
-        message: "Data loaded but AI is not configured",
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonRes({ brief: null, connectedSources, summary, message: "Data loaded but AI is not configured" });
     }
+
+    // Build source-aware prompt
+    const hasGA4 = connectedSources.includes("ga4");
+    const hasShopify = connectedSources.includes("shopify");
+    const hasStripe = connectedSources.includes("stripe");
+
+    const sourceContext = [
+      hasGA4 && "Google Analytics 4 (traffic, sessions, user behavior, acquisition channels)",
+      hasShopify && "Shopify (orders, revenue, products, e-commerce conversions)",
+      hasStripe && "Stripe (payments, subscriptions, MRR, failed charges)",
+    ].filter(Boolean).join("; ");
 
     const systemPrompt = `You are DataBrief AI, a ruthlessly ROI-focused marketing analyst. You analyze real marketing data and produce actionable insights.
 
-Rules:
-- Be specific with numbers from the data provided. Never invent data.
-- Use "you/your" to address the user directly.
-- Be concise and direct. No fluff.
-- If data shows issues (declining metrics, low ROAS channels), call them out clearly.
-- Always end recommendations with specific, measurable actions.`;
+The user has these data sources connected: ${sourceContext}.
 
-    const userPrompt = `Here is the user's marketing data for the last period:
+CRITICAL RULES:
+- ONLY reference data sources that are actually connected. If only GA4 is connected, do NOT mention Shopify orders, Stripe payments, or e-commerce metrics that aren't in the data.
+- If GA4 is connected: focus on traffic analysis, session quality, acquisition channels, user engagement, and conversion tracking.
+- If Shopify is connected: focus on orders, revenue, AOV, top products, cart abandonment, and e-commerce performance.
+- If Stripe is connected: focus on payment volume, subscription health, churn, MRR, and failed payments.
+- When multiple sources are connected, cross-reference them (e.g., GA4 traffic → Shopify conversions → Stripe revenue).
+- Be specific with numbers from the data provided. Never invent data.
+- Use "you/your" to address the user directly. Be concise and direct.
+- If data shows issues, call them out clearly.
+- Always end recommendations with specific, measurable actions.
+- In sourceInsights, ONLY include entries for connected sources.`;
+
+    const userPrompt = `Here is the user's marketing data:
 
 Connected sources: ${connectedSources.join(", ")}
 
@@ -177,7 +184,33 @@ ${summary.bySource.map(s => `- ${s.name}: Revenue $${s.revenue.toFixed(2)}, Spen
 Daily Trend:
 ${summary.byDate.map(d => `- ${d.date}: Revenue $${d.revenue.toFixed(2)}, Sessions ${d.sessions}, Conversions ${d.conversions}`).join("\n")}
 
-Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
+Generate a dashboard brief with source-specific insights. Only include sourceInsights for connected sources: ${connectedSources.join(", ")}.`;
+
+    // Build sourceInsights schema items based on connected sources
+    const sourceInsightItems: any = {
+      type: "object",
+      properties: {
+        source: { type: "string", enum: connectedSources, description: "The connected source this insight is for" },
+        headline: { type: "string", description: "One sentence summary for this source" },
+        metrics: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              label: { type: "string" },
+              value: { type: "string" },
+              status: { type: "string", enum: ["up", "down", "neutral"] },
+            },
+            required: ["label", "value", "status"],
+            additionalProperties: false,
+          },
+          description: "3-5 key metrics specific to this source",
+        },
+        recommendation: { type: "string", description: "One actionable recommendation for this source" },
+      },
+      required: ["source", "headline", "metrics", "recommendation"],
+      additionalProperties: false,
+    };
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -195,15 +228,15 @@ Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
           type: "function",
           function: {
             name: "generate_brief",
-            description: "Generate a complete dashboard brief from marketing data",
+            description: "Generate a dashboard brief with source-specific insights",
             parameters: {
               type: "object",
               properties: {
                 verdict: {
                   type: "object",
                   properties: {
-                    headline: { type: "string", description: "One bold sentence summarizing the most important finding. Use specific numbers." },
-                    body: { type: "string", description: "2-3 sentences explaining the context and what to do about it." },
+                    headline: { type: "string", description: "One bold sentence summarizing the most important finding." },
+                    body: { type: "string", description: "2-3 sentences with context and recommended action." },
                   },
                   required: ["headline", "body"],
                   additionalProperties: false,
@@ -214,15 +247,15 @@ Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
                     type: "object",
                     properties: {
                       type: { type: "string", enum: ["critical", "warning", "opportunity"] },
-                      badge: { type: "string", description: "Short badge text like ACT TODAY, THIS WEEK, OPPORTUNITY" },
+                      badge: { type: "string" },
                       title: { type: "string" },
                       description: { type: "string" },
-                      action: { type: "string", description: "Specific step the user should take" },
+                      action: { type: "string" },
+                      relatedSource: { type: "string", description: "Which connected source this alert relates to" },
                     },
-                    required: ["type", "badge", "title", "description", "action"],
+                    required: ["type", "badge", "title", "description", "action", "relatedSource"],
                     additionalProperties: false,
                   },
-                  description: "1-4 prioritized alerts based on data patterns",
                 },
                 kpis: {
                   type: "array",
@@ -231,20 +264,22 @@ Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
                     properties: {
                       label: { type: "string" },
                       value: { type: "string" },
-                      context: { type: "string", description: "Brief context like '+12% vs last week' or 'Below target'" },
+                      context: { type: "string" },
                       status: { type: "string", enum: ["up", "down", "neutral"] },
+                      source: { type: "string", description: "Which connected source this KPI comes from" },
                     },
-                    required: ["label", "value", "context", "status"],
+                    required: ["label", "value", "context", "status", "source"],
                     additionalProperties: false,
                   },
-                  description: "4-6 key metrics to highlight",
                 },
-                sourceBreakdown: {
-                  type: "string",
-                  description: "A brief 2-3 sentence analysis of traffic/revenue by source",
+                sourceInsights: {
+                  type: "array",
+                  items: sourceInsightItems,
+                  description: `Source-specific insight sections. ONLY include for: ${connectedSources.join(", ")}`,
                 },
+                sourceBreakdown: { type: "string" },
               },
-              required: ["verdict", "alerts", "kpis", "sourceBreakdown"],
+              required: ["verdict", "alerts", "kpis", "sourceInsights", "sourceBreakdown"],
               additionalProperties: false,
             },
           },
@@ -254,24 +289,10 @@ Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
     });
 
     if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (aiResponse.status === 429) return jsonRes({ error: "Rate limit exceeded. Please try again shortly." }, 429);
+      if (aiResponse.status === 402) return jsonRes({ error: "AI credits exhausted." }, 402);
       console.error("AI error:", aiResponse.status, await aiResponse.text());
-      // Return data without AI
-      return new Response(JSON.stringify({
-        brief: null,
-        connectedSources,
-        summary,
-        message: "Data loaded but AI generation failed",
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonRes({ brief: null, connectedSources, summary, message: "Data loaded but AI generation failed" });
     }
 
     const aiResult = await aiResponse.json();
@@ -286,16 +307,9 @@ Generate a complete dashboard brief with verdict, alerts, and KPI analysis.`;
       }
     }
 
-    return new Response(JSON.stringify({
-      brief,
-      connectedSources,
-      summary,
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-
+    return jsonRes({ brief, connectedSources, summary });
   } catch (e) {
     console.error("dashboard-brief error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonRes({ error: e instanceof Error ? e.message : "Unknown error" }, 500);
   }
 });
