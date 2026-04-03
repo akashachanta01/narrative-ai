@@ -38,7 +38,7 @@ export default function AppNavBar() {
 
         {/* Nav links */}
         <div className="flex items-center gap-1">
-          {NAV_ITEMS.map(({ label, path, icon: Icon }) => {
+          {[...NAV_ITEMS, ...(user.email === ADMIN_EMAIL ? [ADMIN_NAV] : [])].map(({ label, path, icon: Icon }) => {
             const active = location.pathname === path;
             return (
               <Link
