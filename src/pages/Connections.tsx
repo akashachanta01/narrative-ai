@@ -83,7 +83,7 @@ export default function Connections() {
   const fetchRows = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase
-      .from("user_connections")
+      .from("user_connections_safe" as any)
       .select("*")
       .eq("user_id", user.id);
     if (data) setRows(data as unknown as ConnectionRow[]);
