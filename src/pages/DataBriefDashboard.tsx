@@ -347,6 +347,7 @@ export default function DataBriefDashboard() {
           <button onClick={() => navigate("/connections")} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>Manage connections →</button>
         </div>
       </div>
+      </div>
     </>
   );
 }
