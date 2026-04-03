@@ -109,7 +109,7 @@ export default function DataBriefDashboard() {
         <div style={{ textAlign: "center", maxWidth: 400 }}>
           <div style={{ fontSize: 48, opacity: 0.15, marginBottom: 12 }}>⚠️</div>
           <p style={{ fontSize: 14, color: T.red, marginBottom: 8 }}>{error}</p>
-          <button onClick={fetchBrief} style={{ fontSize: 12, color: T.teal, background: "rgba(0,212,170,0.08)", border: `1px solid rgba(0,212,170,0.2)`, borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontFamily: T.font }}>Try again</button>
+          <button onClick={() => fetchBrief()} style={{ fontSize: 12, color: T.teal, background: "rgba(0,212,170,0.08)", border: `1px solid rgba(0,212,170,0.2)`, borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontFamily: T.font }}>Try again</button>
         </div>
       </div>
     );
