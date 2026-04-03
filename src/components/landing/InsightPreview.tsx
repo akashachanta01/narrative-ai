@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { PlugZap, MessageSquare, Lightbulb } from "lucide-react";
+import { PlugZap, Sparkles, Lightbulb } from "lucide-react";
 
 const steps = [
   {
@@ -7,19 +7,19 @@ const steps = [
     icon: PlugZap,
     iconColor: "text-blue-400",
     iconBg: "bg-blue-500/15",
-    title: "Connect your tools",
+    title: "Connect via Windsor.ai",
     description:
-      "One-click integrations with GA4, Shopify, Meta Ads, Stripe, and more. No engineering required.",
+      "Enter your Windsor.ai API key to pull data from Google Analytics, Shopify, Stripe, and more — all in one place.",
     accentColor: "hsl(217 91% 60%)",
   },
   {
     number: "02",
-    icon: MessageSquare,
+    icon: Sparkles,
     iconColor: "text-violet-400",
     iconBg: "bg-violet-500/15",
-    title: "Ask anything",
+    title: "AI analyzes your data",
     description:
-      '"Why did revenue drop last Tuesday?" Type it like you\'d ask a colleague. Get a real, sourced answer.',
+      "DataBrief's AI reads your metrics and generates a personalized brief — highlighting wins, problems, and opportunities.",
     accentColor: "hsl(263 70% 60%)",
   },
   {
@@ -57,7 +57,6 @@ const InsightPreview = () => {
         </motion.div>
 
         <div className="relative">
-          {/* Connector line (desktop) */}
           <div className="hidden md:block absolute top-[52px] left-[calc(16.666%+28px)] right-[calc(16.666%+28px)] h-px bg-gradient-to-r from-border via-border/60 to-border z-0" />
 
           <div className="grid gap-8 md:grid-cols-3 relative z-10">
@@ -72,14 +71,12 @@ const InsightPreview = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, delay: i * 0.12 }}
                 >
-                  {/* Icon circle */}
                   <div className="relative mb-6">
                     <div
                       className={`w-14 h-14 rounded-2xl flex items-center justify-center ${step.iconBg} ring-1 ring-border/40 shadow-sm`}
                     >
                       <Icon className={`w-6 h-6 ${step.iconColor}`} />
                     </div>
-                    {/* Step number badge */}
                     <div
                       className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
                       style={{ background: step.accentColor }}
@@ -88,7 +85,6 @@ const InsightPreview = () => {
                     </div>
                   </div>
 
-                  {/* Step number label */}
                   <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase mb-3 font-sans"
                     style={{ color: step.accentColor }}>
                     Step {step.number}
@@ -114,9 +110,9 @@ const InsightPreview = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="text-2xl mb-3">💬</div>
+          <div className="text-2xl mb-3">🤖</div>
           <blockquote className="text-base sm:text-lg text-foreground font-medium mb-3 font-sans leading-relaxed">
-            "Why did my revenue drop on Tuesday?"
+            "What should I focus on this week?"
           </blockquote>
           <div
             className="inline-flex items-start gap-3 rounded-xl border px-4 py-3 text-left max-w-md mx-auto"
@@ -127,8 +123,8 @@ const InsightPreview = () => {
           >
             <span className="text-accent mt-0.5 shrink-0">✨</span>
             <p className="text-sm text-muted-foreground leading-relaxed font-sans">
-              Revenue dropped 18% on Tuesday due to a broken checkout form affecting mobile users.
-              Meta Ads traffic was up 22% that day, meaning you paid for visitors who couldn't convert.
+              Your Google organic traffic is up 23% but checkout conversion dropped 34% on mobile.
+              Fix the shipping step in checkout — you're losing ~$2,400/week in missed revenue.
             </p>
           </div>
         </motion.div>

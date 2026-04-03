@@ -3,20 +3,13 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, ChevronDown } from "lucide-react";
 
-const stats = [
-  { value: "500+", label: "teams" },
-  { value: "50M+", label: "insights generated" },
-  { value: "100+", label: "integrations" },
-];
-
-const integrations = ["Google Analytics", "Shopify", "Stripe", "Meta Ads", "TikTok", "HubSpot"];
+const integrations = ["Google Analytics", "Shopify", "Stripe"];
 
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden bg-background">
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Dot grid */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.025]" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="dot-grid" width="32" height="32" patternUnits="userSpaceOnUse">
@@ -25,7 +18,6 @@ const HeroSection = () => {
           </defs>
           <rect width="100%" height="100%" fill="url(#dot-grid)" />
         </svg>
-        {/* Gradient orbs */}
         <div
           className="absolute -top-60 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-[0.09]"
           style={{ background: "radial-gradient(ellipse, hsl(230 65% 56%), transparent 65%)" }}
@@ -41,7 +33,6 @@ const HeroSection = () => {
       </div>
 
       <div className="container relative z-10 px-6 pt-20 pb-14 sm:pt-28 sm:pb-20 max-w-6xl mx-auto">
-        {/* Center text block */}
         <div className="text-center max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -51,7 +42,7 @@ const HeroSection = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold mb-8 text-accent tracking-wide font-sans">
               <Sparkles className="w-3 h-3" />
-              Now in public beta — free to use
+              Now in early access — free to use
             </div>
 
             {/* Headline */}
@@ -72,19 +63,9 @@ const HeroSection = () => {
 
             {/* Subheadline */}
             <p className="text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10 font-sans text-muted-foreground">
-              DataBrief connects your marketing and sales tools, then tells you what happened,
-              why it happened, and what to do next — in plain English.
+              DataBrief connects your marketing and sales tools via Windsor.ai, then delivers
+              AI-powered insights — what happened, why, and what to do next.
             </p>
-
-            {/* Social proof stats */}
-            <div className="flex items-center justify-center gap-10 sm:gap-16 mb-10 font-sans">
-              {stats.map(({ value, label }) => (
-                <div key={label} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-foreground">{value}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
-                </div>
-              ))}
-            </div>
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-16 font-sans">
@@ -109,14 +90,13 @@ const HeroSection = () => {
           </motion.div>
         </div>
 
-        {/* Dashboard mockup */}
+        {/* Dashboard mockup — matches real DataBrief AI dashboard */}
         <motion.div
           className="relative max-w-5xl mx-auto"
           initial={{ opacity: 0, y: 48 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, delay: 0.2 }}
         >
-          {/* Glow behind mockup */}
           <div
             className="absolute inset-x-24 -top-8 h-32 rounded-full blur-3xl opacity-30 pointer-events-none"
             style={{ background: "linear-gradient(135deg, hsl(230 65% 56%), hsl(170 55% 50%))" }}
@@ -124,7 +104,7 @@ const HeroSection = () => {
 
           <div
             className="relative rounded-2xl overflow-hidden border shadow-2xl shadow-black/30"
-            style={{ background: "hsl(220 25% 9%)", borderColor: "hsl(220 15% 17%)" }}
+            style={{ background: "#0A0D12", borderColor: "hsl(220 15% 17%)" }}
           >
             {/* Browser chrome */}
             <div
@@ -154,216 +134,110 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* App layout */}
-            <div className="flex" style={{ minHeight: "420px" }}>
-              {/* Sidebar */}
-              <div
-                className="hidden sm:flex w-52 shrink-0 border-r flex-col gap-0.5 p-3"
-                style={{ borderColor: "hsl(220 15% 16%)", background: "hsl(220 22% 8%)" }}
-              >
-                {/* Brand */}
-                <div className="flex items-center gap-2 px-2 py-2 mb-3">
-                  <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center"
-                    style={{ background: "hsl(230 65% 56%)" }}
-                  >
-                    <span className="text-[10px] font-bold text-white">D</span>
-                  </div>
-                  <span className="text-sm font-semibold" style={{ color: "hsl(220 14% 92%)" }}>
-                    DataBrief
-                  </span>
+            {/* Dashboard content */}
+            <div className="p-4 sm:p-6 space-y-4" style={{ minHeight: "420px" }}>
+              {/* Top bar */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: "#00D4AA" }} />
+                  <span className="text-[11px]" style={{ color: "#00D4AA" }}>DataBrief AI · your analytics analyst</span>
                 </div>
-                {/* Nav */}
-                {[
-                  { label: "Overview", active: true },
-                  { label: "Traffic", active: false },
-                  { label: "Revenue", active: false },
-                  { label: "Campaigns", active: false },
-                  { label: "AI Insights", active: false },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium"
-                    style={{
-                      background: item.active ? "hsl(230 65% 56% / 0.15)" : "transparent",
-                      color: item.active ? "hsl(230 65% 72%)" : "hsl(220 10% 52%)",
-                    }}
-                  >
+                <div className="flex gap-1">
+                  {["7d", "30d", "90d"].map((label, i) => (
                     <div
-                      className="w-1.5 h-1.5 rounded-full"
+                      key={label}
+                      className="text-[10px] px-2 py-1 rounded"
                       style={{
-                        background: item.active ? "hsl(230 65% 62%)" : "transparent",
+                        background: i === 0 ? "rgba(0,212,170,0.12)" : "rgba(255,255,255,0.03)",
+                        border: `1px solid ${i === 0 ? "rgba(0,212,170,0.3)" : "rgba(255,255,255,0.04)"}`,
+                        color: i === 0 ? "#00D4AA" : "#6B7280",
+                        fontWeight: i === 0 ? 600 : 400,
                       }}
-                    />
-                    {item.label}
-                  </div>
-                ))}
-                <div className="flex-1" />
-                {/* User */}
-                <div className="flex items-center gap-2 px-2 py-2 mt-2">
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold"
-                    style={{ background: "hsl(230 65% 56% / 0.2)", color: "hsl(230 65% 72%)" }}
-                  >
-                    SC
-                  </div>
-                  <div>
-                    <div className="text-[11px] font-medium" style={{ color: "hsl(220 14% 80%)" }}>
-                      Sarah Chen
-                    </div>
-                    <div className="text-[10px]" style={{ color: "hsl(220 10% 44%)" }}>
-                      Growth Lead
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main content */}
-              <div className="flex-1 overflow-hidden p-4 sm:p-5 flex flex-col gap-4">
-                {/* Topbar */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-semibold" style={{ color: "hsl(220 14% 92%)" }}>
-                      Overview
-                    </h2>
-                    <p className="text-[11px]" style={{ color: "hsl(220 10% 48%)" }}>
-                      Last 30 days · Updated 2 min ago
-                    </p>
-                  </div>
-                  <div
-                    className="px-3 py-1.5 rounded-lg border text-[11px]"
-                    style={{ borderColor: "hsl(220 15% 18%)", color: "hsl(220 10% 55%)" }}
-                  >
-                    Last 30 days ↓
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {[
-                    { label: "Visitors", value: "24.8K", change: "+12.4%", up: true },
-                    { label: "Revenue", value: "$18,240", change: "+8.2%", up: true },
-                    { label: "Conversion", value: "3.2%", change: "+0.4%", up: true },
-                    { label: "Bounce Rate", value: "38%", change: "-2.1%", up: true },
-                  ].map((m) => (
-                    <div
-                      key={m.label}
-                      className="p-3 rounded-xl border"
-                      style={{ background: "hsl(220 20% 8%)", borderColor: "hsl(220 15% 17%)" }}
                     >
-                      <p className="text-[10px] mb-1.5" style={{ color: "hsl(220 10% 50%)" }}>
-                        {m.label}
-                      </p>
-                      <p className="text-base sm:text-lg font-bold" style={{ color: "hsl(220 14% 94%)" }}>
-                        {m.value}
-                      </p>
-                      <p className="text-[10px] font-medium text-emerald-400 mt-0.5">{m.change}</p>
+                      {label}
                     </div>
                   ))}
                 </div>
+              </div>
 
-                {/* Chart + AI panel */}
-                <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3 min-h-0">
-                  {/* Chart */}
-                  <div
-                    className="sm:col-span-2 rounded-xl border p-3 flex flex-col"
-                    style={{ background: "hsl(220 20% 8%)", borderColor: "hsl(220 15% 17%)" }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium" style={{ color: "hsl(220 14% 80%)" }}>
-                        Traffic & Revenue
-                      </span>
-                      <div className="flex items-center gap-3">
-                        {[
-                          { color: "hsl(230 65% 60%)", label: "Visitors" },
-                          { color: "hsl(142 70% 50%)", label: "Revenue" },
-                        ].map((l) => (
-                          <span
-                            key={l.label}
-                            className="flex items-center gap-1 text-[10px]"
-                            style={{ color: "hsl(220 10% 50%)" }}
-                          >
-                            <span className="w-2 h-2 rounded-full" style={{ background: l.color }} />
-                            {l.label}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <svg className="flex-1 w-full" viewBox="0 0 400 90" preserveAspectRatio="none" style={{ minHeight: 80 }}>
-                      <defs>
-                        <linearGradient id="hAreaFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="hsl(230 65% 56%)" stopOpacity="0.25" />
-                          <stop offset="100%" stopColor="hsl(230 65% 56%)" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      {[22, 44, 66].map((y) => (
-                        <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="white" strokeOpacity="0.04" />
-                      ))}
-                      <path
-                        d="M0,65 C25,60 50,52 75,48 C100,44 125,58 160,38 C195,18 220,32 250,24 C280,16 310,34 340,22 C365,12 385,20 400,14 L400,90 L0,90Z"
-                        fill="url(#hAreaFill)"
-                      />
-                      <path
-                        d="M0,65 C25,60 50,52 75,48 C100,44 125,58 160,38 C195,18 220,32 250,24 C280,16 310,34 340,22 C365,12 385,20 400,14"
-                        stroke="hsl(230 65% 60%)"
-                        strokeWidth="1.5"
-                        fill="none"
-                        strokeLinecap="round"
-                      />
-                      {[12, 60, 110, 160, 210, 258, 308, 356].map((x, i) => {
-                        const h = [18, 28, 22, 38, 26, 32, 44, 30][i];
-                        return (
-                          <rect
-                            key={i}
-                            x={x}
-                            y={90 - h}
-                            width="14"
-                            height={h}
-                            fill="hsl(142 70% 50%)"
-                            opacity="0.65"
-                            rx="2"
-                          />
-                        );
-                      })}
-                    </svg>
-                  </div>
+              {/* Greeting */}
+              <div>
+                <p className="text-[16px] font-medium" style={{ color: "#E8EAF0" }}>
+                  Good morning, <span style={{ color: "#00D4AA" }}>Sarah</span>.
+                </p>
+                <p className="text-[11px]" style={{ color: "#6B7280" }}>Wednesday, April 2</p>
+              </div>
 
-                  {/* AI Insight panel */}
-                  <div
-                    className="rounded-xl border p-3 flex flex-col"
-                    style={{
-                      background: "hsl(230 65% 56% / 0.07)",
-                      borderColor: "hsl(230 65% 56% / 0.22)",
-                    }}
-                  >
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <div
-                        className="w-5 h-5 rounded-md flex items-center justify-center"
-                        style={{ background: "hsl(230 65% 56% / 0.2)" }}
-                      >
-                        <Sparkles className="w-2.5 h-2.5" style={{ color: "hsl(230 65% 70%)" }} />
-                      </div>
-                      <span className="text-[11px] font-semibold" style={{ color: "hsl(230 65% 70%)" }}>
-                        AI Insights
-                      </span>
-                    </div>
-                    <div className="space-y-2 flex-1">
-                      {[
-                        "Instagram drove 40% of new visitors with 2.3× higher revenue per visit.",
-                        "Bounce rate dropped 2.1% after landing page update on Mar 15.",
-                        "Email campaigns show strongest ROAS at 4.1× — consider increasing budget.",
-                      ].map((text, i) => (
-                        <div
-                          key={i}
-                          className="p-2 rounded-lg text-[10px] leading-relaxed"
-                          style={{ background: "hsl(220 22% 10%)", color: "hsl(220 10% 60%)" }}
-                        >
-                          {text}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              {/* Source pills */}
+              <div className="flex gap-1.5">
+                <span className="text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1" style={{ color: "#F5A623", background: "rgba(245,166,35,0.07)", border: "1px solid rgba(245,166,35,0.2)" }}>
+                  📊 Google Analytics
+                </span>
+                <span className="text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1" style={{ color: "#00D4AA", background: "rgba(0,212,170,0.07)", border: "1px solid rgba(0,212,170,0.2)" }}>
+                  🛒 Shopify
+                </span>
+              </div>
+
+              {/* AI Verdict */}
+              <div className="rounded-xl p-3.5" style={{ background: "#0E1A16", border: "1px solid rgba(0,212,170,0.13)" }}>
+                <p className="text-[13px] font-medium leading-relaxed" style={{ color: "#fff" }}>
+                  Your Google organic traffic is up 23% — but Shopify conversion rate dropped to 1.8%, costing you ~$2,400 in missed revenue.
+                </p>
+                <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: "#6B7280" }}>
+                  Focus on checkout optimization. Mobile bounce rate spiked 15% after last week's theme update.
+                </p>
+              </div>
+
+              {/* Alerts */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="rounded-lg p-3" style={{ background: "#160A0A", border: "1px solid rgba(255,77,77,0.17)" }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: "#FF6B6B" }}>⚠ CRITICAL</span>
+                  <p className="text-[12px] font-medium mt-1" style={{ color: "#fff" }}>Checkout conversion dropped 34%</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: "#6B7280" }}>Mobile users abandoning at shipping step</p>
                 </div>
+                <div className="rounded-lg p-3" style={{ background: "#0D1520", border: "1px solid rgba(59,130,246,0.17)" }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: "#60A5FA" }}>🔵 OPPORTUNITY</span>
+                  <p className="text-[12px] font-medium mt-1" style={{ color: "#fff" }}>Email ROAS at 4.1× — best channel</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: "#6B7280" }}>Consider increasing email campaign budget 20%</p>
+                </div>
+              </div>
+
+              {/* KPI tiles */}
+              <div>
+                <p className="text-[11px] font-medium mb-2" style={{ color: "#6B7280" }}>The numbers</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { label: "Sessions", value: "12,847", ctx: "↑ 23% vs prior", up: true },
+                    { label: "Revenue", value: "$8,420", ctx: "↓ 6% vs prior", up: false },
+                    { label: "ROAS", value: "3.2×", ctx: "Above target", up: true },
+                    { label: "Conv. Rate", value: "1.8%", ctx: "↓ needs attention", up: false },
+                  ].map((kpi) => (
+                    <div key={kpi.label} className="rounded-lg p-2.5" style={{ background: "#111520", border: "1px solid rgba(255,255,255,0.04)" }}>
+                      <span className="text-[9px]" style={{ color: "#555" }}>{kpi.label}</span>
+                      <p className="text-[16px] font-medium mt-0.5" style={{ color: "#E8EAF0" }}>{kpi.value}</p>
+                      <span className="text-[9px]" style={{ color: kpi.up ? "#00D4AA" : "#FF6B6B" }}>{kpi.ctx}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Source breakdown bars */}
+              <div className="rounded-lg p-3" style={{ background: "#111520", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <p className="text-[11px] font-medium mb-2" style={{ color: "#888" }}>Traffic by source</p>
+                {[
+                  { name: "google / organic", pct: 100, sessions: "5,230" },
+                  { name: "direct / none", pct: 62, sessions: "3,240" },
+                  { name: "email / campaign", pct: 38, sessions: "1,990" },
+                  { name: "social / instagram", pct: 22, sessions: "1,150" },
+                ].map((src) => (
+                  <div key={src.name} className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10px] w-28 truncate" style={{ color: "#6B7280" }}>{src.name}</span>
+                    <div className="flex-1 h-1 rounded-full" style={{ background: "rgba(255,255,255,0.03)" }}>
+                      <div className="h-1 rounded-full" style={{ width: `${src.pct}%`, background: "#00D4AA" }} />
+                    </div>
+                    <span className="text-[10px] w-12 text-right" style={{ color: "#6B7280" }}>{src.sessions}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -377,7 +251,7 @@ const HeroSection = () => {
           transition={{ duration: 0.5, delay: 0.65 }}
         >
           <p className="text-[11px] uppercase tracking-[0.15em] mb-6 text-muted-foreground">
-            Works with
+            Connects via Windsor.ai to
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
             {integrations.map((name) => (
