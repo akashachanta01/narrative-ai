@@ -52,24 +52,38 @@ const PULSE_CSS = `@keyframes dbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 
 
 /* ─── Main ─── */
 export default function DataBriefDashboard() {
+  const DATE_RANGES = [
+    { label: "Last 7 days", days: 7 },
+    { label: "Last 30 days", days: 30 },
+    { label: "Last 90 days", days: 90 },
+  ] as const;
+
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [days, setDays] = useState(7);
 
-  const fetchBrief = useCallback(async () => {
+  const fetchBrief = useCallback(async (d: number = days) => {
     if (!user) return;
     setLoading(true); setError(null);
     try {
-      const { data: fnData, error: fnError } = await supabase.functions.invoke("dashboard-brief", { body: {} });
-      if (fnError) throw fnError;
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/dashboard-brief?days=${d}`,
+        { method: "POST", headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json", apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY }, body: "{}" }
+      );
+      const fnData = await res.json();
+      if (!res.ok) throw new Error(fnData.error || "Failed");
       setData(fnData as DashboardResponse);
     } catch (e: any) {
       console.error("Dashboard brief error:", e);
       setError(e?.message || "Failed to load dashboard");
     } finally { setLoading(false); }
-  }, [user]);
+  }, [user, days]);
 
   useEffect(() => {
     if (authLoading) return;
