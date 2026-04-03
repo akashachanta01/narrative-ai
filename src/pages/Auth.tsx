@@ -29,7 +29,21 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) navigate("/dashboard");
+    if (!user) return;
+    // Check if user has any connections — if not, send to connections page
+    const checkConnections = async () => {
+      const { data } = await supabase
+        .from("user_connections")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+      if (data && data.length > 0) {
+        navigate("/dashboard");
+      } else {
+        navigate("/connections");
+      }
+    };
+    checkConnections();
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

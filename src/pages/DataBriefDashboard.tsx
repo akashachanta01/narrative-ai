@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import AppNavBar from "@/components/AppNavBar";
 import { useAuth } from "@/contexts/AuthContext";
 
 /* ─── Types ─── */
@@ -141,7 +142,9 @@ export default function DataBriefDashboard() {
   return (
     <>
       <style>{PULSE_CSS}</style>
-      <div style={{ background: T.bg, color: T.textPrimary, fontFamily: T.font, minHeight: "100vh", maxWidth: "100%", margin: 0, padding: "0 24px 40px" }}>
+      <div style={{ background: T.bg, minHeight: "100vh" }}>
+      <AppNavBar />
+      <div style={{ color: T.textPrimary, fontFamily: T.font, maxWidth: "100%", margin: 0, padding: "0 24px 40px" }}>
         {/* Top bar */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -343,6 +346,7 @@ export default function DataBriefDashboard() {
           <button onClick={() => fetchBrief()} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>↻ Refresh brief</button>
           <button onClick={() => navigate("/connections")} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>Manage connections →</button>
         </div>
+      </div>
       </div>
     </>
   );

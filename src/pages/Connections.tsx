@@ -5,8 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import AppNavBar from "@/components/AppNavBar";
 import {
-  ArrowLeft,
   ArrowRight,
   BarChart3,
   CheckCircle2,
@@ -16,7 +16,6 @@ import {
   KeyRound,
   Layers,
   Loader2,
-  LogOut,
   ShoppingBag,
   Trash2,
   AlertTriangle,
@@ -178,18 +177,7 @@ export default function Connections() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 px-4 sm:px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-sm font-semibold text-foreground tracking-tight">Connections</h1>
-        </div>
-        <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={signOut}>
-          <LogOut className="h-3.5 w-3.5 mr-1.5" />
-          Sign out
-        </Button>
-      </header>
+      <AppNavBar />
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
         {/* All connected banner */}
