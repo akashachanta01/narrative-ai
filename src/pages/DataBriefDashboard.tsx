@@ -340,7 +340,7 @@ export default function DataBriefDashboard() {
 
         {/* Footer */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, paddingTop: 14, borderTop: `1px solid ${T.borderDefault}` }}>
-          <button onClick={fetchBrief} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>↻ Refresh brief</button>
+          <button onClick={() => fetchBrief()} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>↻ Refresh brief</button>
           <button onClick={() => navigate("/connections")} style={{ fontSize: 12, color: T.textSecondary, background: "rgba(255,255,255,0.03)", border: `1px solid ${T.borderSubtle}`, borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: T.font }}>Manage connections →</button>
         </div>
       </div>
