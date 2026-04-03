@@ -46,7 +46,5 @@ const App = () => (
   </HelmetProvider>
 );
 
-export default App;
-);
 
 export default App;
