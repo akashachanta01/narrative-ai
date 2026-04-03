@@ -5,8 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import AppNavBar from "@/components/AppNavBar";
 import {
-  ArrowLeft,
   ArrowRight,
   BarChart3,
   CheckCircle2,
@@ -16,7 +16,6 @@ import {
   KeyRound,
   Layers,
   Loader2,
-  LogOut,
   ShoppingBag,
   Trash2,
   AlertTriangle,
