@@ -1,0 +1,1 @@
+ALTER TABLE public.page_views ADD COLUMN visitor_id text;
