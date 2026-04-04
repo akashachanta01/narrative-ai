@@ -11,7 +11,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { path, referrer } = await req.json();
+    const { path, referrer, visitorId } = await req.json();
     if (!path || typeof path !== "string") {
       return new Response(JSON.stringify({ error: "path required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -26,6 +26,7 @@ serve(async (req) => {
       path: path.slice(0, 500),
       referrer: referrer?.slice(0, 500) || null,
       user_agent: req.headers.get("user-agent")?.slice(0, 500) || null,
+      visitor_id: typeof visitorId === "string" ? visitorId.slice(0, 100) : null,
     });
 
     return new Response(JSON.stringify({ ok: true }), {
