@@ -109,6 +109,24 @@ serve(async (req) => {
       pageCounts[pv.path] = (pageCounts[pv.path] || 0) + 1;
     }
 
+    // Unique visitors
+    const allVisitorIds = new Set((pageViews || []).filter((pv: any) => pv.visitor_id).map((pv: any) => pv.visitor_id));
+    const visitorIds7d = new Set(
+      (pageViews || []).filter((pv: any) => pv.visitor_id && new Date(pv.created_at) >= days7ago).map((pv: any) => pv.visitor_id)
+    );
+
+    // Unique visitors by day
+    const uniqueVisitorsByDay: Record<string, Set<string>> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      uniqueVisitorsByDay[d.toISOString().slice(0, 10)] = new Set();
+    }
+    for (const pv of (pageViews || [])) {
+      if (!pv.visitor_id) continue;
+      const day = new Date(pv.created_at).toISOString().slice(0, 10);
+      if (uniqueVisitorsByDay[day]) uniqueVisitorsByDay[day].add(pv.visitor_id);
+    }
+
     // Recent users
     const recentUsers = users
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
