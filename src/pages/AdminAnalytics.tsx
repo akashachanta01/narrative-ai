@@ -103,7 +103,9 @@ export default function AdminAnalytics() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <KpiCard icon={<Eye className="h-4 w-4" />} label="Page Views (30d)" value={stats.totalPageViews} />
+          <KpiCard icon={<Globe className="h-4 w-4" />} label="Page Views (7d)" value={stats.pageViewsLast7d} />
           <KpiCard icon={<Users className="h-4 w-4" />} label="Total Users" value={stats.totalUsers} />
           <KpiCard icon={<TrendingUp className="h-4 w-4" />} label="Signups (7d)" value={stats.signupsLast7d} />
           <KpiCard icon={<Plug className="h-4 w-4" />} label="Connections" value={stats.totalConnections} />
