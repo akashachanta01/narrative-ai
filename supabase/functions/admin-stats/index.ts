@@ -131,6 +131,10 @@ serve(async (req) => {
       providerCounts,
       connProviderCounts,
       recentUsers,
+      totalPageViews: pageViews?.length || 0,
+      pageViewsLast7d: (pageViews || []).filter((pv) => new Date(pv.created_at) >= days7ago).length,
+      pageViewsByDay: Object.entries(pageViewsByDay).map(([date, count]) => ({ date, count })),
+      topPages: Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10),
     };
 
     return new Response(JSON.stringify(stats), {
