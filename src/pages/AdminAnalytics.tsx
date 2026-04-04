@@ -16,6 +16,10 @@ interface AdminStats {
   providerCounts: Record<string, number>;
   connProviderCounts: Record<string, number>;
   recentUsers: { email: string; provider: string; createdAt: string; lastSignIn: string }[];
+  totalPageViews: number;
+  pageViewsLast7d: number;
+  pageViewsByDay: { date: string; count: number }[];
+  topPages: [string, number][];
 }
 
 export default function AdminAnalytics() {
