@@ -46,16 +46,16 @@ serve(async (req) => {
     // Get all connections
     const { data: connections } = await adminClient.from("user_connections").select("*");
 
+    // Build stats
+    const now = new Date();
+    const days30ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const days7ago = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
     // Get page views (last 30 days)
     const { data: pageViews } = await adminClient
       .from("page_views")
       .select("*")
       .gte("created_at", days30ago.toISOString());
-
-    // Build stats
-    const now = new Date();
-    const days30ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const days7ago = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Signups by day (last 30 days)
     const signupsByDay: Record<string, number> = {};
@@ -109,6 +109,24 @@ serve(async (req) => {
       pageCounts[pv.path] = (pageCounts[pv.path] || 0) + 1;
     }
 
+    // Unique visitors
+    const allVisitorIds = new Set((pageViews || []).filter((pv: any) => pv.visitor_id).map((pv: any) => pv.visitor_id));
+    const visitorIds7d = new Set(
+      (pageViews || []).filter((pv: any) => pv.visitor_id && new Date(pv.created_at) >= days7ago).map((pv: any) => pv.visitor_id)
+    );
+
+    // Unique visitors by day
+    const uniqueVisitorsByDay: Record<string, Set<string>> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      uniqueVisitorsByDay[d.toISOString().slice(0, 10)] = new Set();
+    }
+    for (const pv of (pageViews || [])) {
+      if (!pv.visitor_id) continue;
+      const day = new Date(pv.created_at).toISOString().slice(0, 10);
+      if (uniqueVisitorsByDay[day]) uniqueVisitorsByDay[day].add(pv.visitor_id);
+    }
+
     // Recent users
     const recentUsers = users
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -132,9 +150,12 @@ serve(async (req) => {
       connProviderCounts,
       recentUsers,
       totalPageViews: pageViews?.length || 0,
-      pageViewsLast7d: (pageViews || []).filter((pv) => new Date(pv.created_at) >= days7ago).length,
+      pageViewsLast7d: (pageViews || []).filter((pv: any) => new Date(pv.created_at) >= days7ago).length,
       pageViewsByDay: Object.entries(pageViewsByDay).map(([date, count]) => ({ date, count })),
       topPages: Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10),
+      uniqueVisitors30d: allVisitorIds.size,
+      uniqueVisitors7d: visitorIds7d.size,
+      uniqueVisitorsByDay: Object.entries(uniqueVisitorsByDay).map(([date, visitors]) => ({ date, count: visitors.size })),
     };
 
     return new Response(JSON.stringify(stats), {

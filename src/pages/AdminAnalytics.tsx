@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AppNavBar from "@/components/AppNavBar";
-import { Loader2, Users, Plug, TrendingUp, Clock, Eye, Globe } from "lucide-react";
+import { Loader2, Users, Plug, TrendingUp, Clock, Eye, Globe, UserCheck } from "lucide-react";
 
 interface AdminStats {
   totalUsers: number;
@@ -20,6 +20,9 @@ interface AdminStats {
   pageViewsLast7d: number;
   pageViewsByDay: { date: string; count: number }[];
   topPages: [string, number][];
+  uniqueVisitors30d: number;
+  uniqueVisitors7d: number;
+  uniqueVisitorsByDay: { date: string; count: number }[];
 }
 
 export default function AdminAnalytics() {
@@ -86,9 +89,10 @@ export default function AdminAnalytics() {
 
   if (!stats) return null;
 
-  const maxSignups = Math.max(...stats.signupsByDay.map((d) => d.count), 1);
-  const maxConns = Math.max(...stats.connectionsByDay.map((d) => d.count), 1);
-  const maxPageViews = Math.max(...stats.pageViewsByDay.map((d) => d.count), 1);
+  const maxSignups = Math.max(...(stats.signupsByDay || []).map((d) => d.count), 1);
+  const maxConns = Math.max(...(stats.connectionsByDay || []).map((d) => d.count), 1);
+  const maxPageViews = Math.max(...(stats.pageViewsByDay || []).map((d) => d.count), 1);
+  const maxUniqueVisitors = Math.max(...(stats.uniqueVisitorsByDay || []).map((d) => d.count), 1);
   const conversionRate = stats.totalUsers > 0
     ? Math.round((stats.usersWithConnections / stats.totalUsers) * 100)
     : 0;
@@ -103,9 +107,13 @@ export default function AdminAnalytics() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          <KpiCard icon={<UserCheck className="h-4 w-4" />} label="Unique Visitors (30d)" value={stats.uniqueVisitors30d ?? 0} />
+          <KpiCard icon={<UserCheck className="h-4 w-4" />} label="Unique Visitors (7d)" value={stats.uniqueVisitors7d ?? 0} />
           <KpiCard icon={<Eye className="h-4 w-4" />} label="Page Views (30d)" value={stats.totalPageViews} />
           <KpiCard icon={<Globe className="h-4 w-4" />} label="Page Views (7d)" value={stats.pageViewsLast7d} />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <KpiCard icon={<Users className="h-4 w-4" />} label="Total Users" value={stats.totalUsers} />
           <KpiCard icon={<TrendingUp className="h-4 w-4" />} label="Signups (7d)" value={stats.signupsLast7d} />
           <KpiCard icon={<Plug className="h-4 w-4" />} label="Connections" value={stats.totalConnections} />
@@ -113,15 +121,18 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Charts */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <BarChart title="Page Views (last 30 days)" data={stats.pageViewsByDay} max={maxPageViews} color="bg-primary" />
-          <BarChart title="Signups (last 30 days)" data={stats.signupsByDay} max={maxSignups} color="bg-accent" />
-          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay} max={maxConns} color="bg-accent" />
+        <div className="grid md:grid-cols-2 gap-6">
+          <BarChart title="Unique Visitors (last 30 days)" data={stats.uniqueVisitorsByDay || []} max={maxUniqueVisitors} color="bg-primary" />
+          <BarChart title="Page Views (last 30 days)" data={stats.pageViewsByDay || []} max={maxPageViews} color="bg-accent" />
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <BarChart title="Signups (last 30 days)" data={stats.signupsByDay || []} max={maxSignups} color="bg-accent" />
+          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay || []} max={maxConns} color="bg-accent" />
         </div>
 
         {/* Breakdowns */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Breakdown title="Top Pages" data={Object.fromEntries(stats.topPages)} />
+          <Breakdown title="Top Pages" data={Object.fromEntries(stats.topPages || [])} />
           <Breakdown title="Auth Providers" data={stats.providerCounts} />
           <Breakdown title="Connected Sources" data={stats.connProviderCounts} />
         </div>
