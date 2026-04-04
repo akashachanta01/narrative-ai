@@ -150,9 +150,12 @@ serve(async (req) => {
       connProviderCounts,
       recentUsers,
       totalPageViews: pageViews?.length || 0,
-      pageViewsLast7d: (pageViews || []).filter((pv) => new Date(pv.created_at) >= days7ago).length,
+      pageViewsLast7d: (pageViews || []).filter((pv: any) => new Date(pv.created_at) >= days7ago).length,
       pageViewsByDay: Object.entries(pageViewsByDay).map(([date, count]) => ({ date, count })),
       topPages: Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10),
+      uniqueVisitors30d: allVisitorIds.size,
+      uniqueVisitors7d: visitorIds7d.size,
+      uniqueVisitorsByDay: Object.entries(uniqueVisitorsByDay).map(([date, visitors]) => ({ date, count: visitors.size })),
     };
 
     return new Response(JSON.stringify(stats), {
