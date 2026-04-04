@@ -113,9 +113,10 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Charts */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <BarChart title="Page Views (last 30 days)" data={stats.pageViewsByDay} max={maxPageViews} color="bg-primary" />
           <BarChart title="Signups (last 30 days)" data={stats.signupsByDay} max={maxSignups} color="bg-accent" />
-          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay} max={maxConns} color="bg-primary" />
+          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay} max={maxConns} color="bg-accent" />
         </div>
 
         {/* Breakdowns */}
