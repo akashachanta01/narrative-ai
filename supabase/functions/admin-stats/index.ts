@@ -46,6 +46,12 @@ serve(async (req) => {
     // Get all connections
     const { data: connections } = await adminClient.from("user_connections").select("*");
 
+    // Get page views (last 30 days)
+    const { data: pageViews } = await adminClient
+      .from("page_views")
+      .select("*")
+      .gte("created_at", days30ago.toISOString());
+
     // Build stats
     const now = new Date();
     const days30ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
