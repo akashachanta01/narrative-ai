@@ -107,9 +107,13 @@ export default function AdminAnalytics() {
         </div>
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          <KpiCard icon={<UserCheck className="h-4 w-4" />} label="Unique Visitors (30d)" value={stats.uniqueVisitors30d ?? 0} />
+          <KpiCard icon={<UserCheck className="h-4 w-4" />} label="Unique Visitors (7d)" value={stats.uniqueVisitors7d ?? 0} />
           <KpiCard icon={<Eye className="h-4 w-4" />} label="Page Views (30d)" value={stats.totalPageViews} />
           <KpiCard icon={<Globe className="h-4 w-4" />} label="Page Views (7d)" value={stats.pageViewsLast7d} />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <KpiCard icon={<Users className="h-4 w-4" />} label="Total Users" value={stats.totalUsers} />
           <KpiCard icon={<TrendingUp className="h-4 w-4" />} label="Signups (7d)" value={stats.signupsLast7d} />
           <KpiCard icon={<Plug className="h-4 w-4" />} label="Connections" value={stats.totalConnections} />
@@ -117,10 +121,13 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Charts */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <BarChart title="Page Views (last 30 days)" data={stats.pageViewsByDay} max={maxPageViews} color="bg-primary" />
-          <BarChart title="Signups (last 30 days)" data={stats.signupsByDay} max={maxSignups} color="bg-accent" />
-          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay} max={maxConns} color="bg-accent" />
+        <div className="grid md:grid-cols-2 gap-6">
+          <BarChart title="Unique Visitors (last 30 days)" data={stats.uniqueVisitorsByDay || []} max={maxUniqueVisitors} color="bg-primary" />
+          <BarChart title="Page Views (last 30 days)" data={stats.pageViewsByDay || []} max={maxPageViews} color="bg-accent" />
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <BarChart title="Signups (last 30 days)" data={stats.signupsByDay || []} max={maxSignups} color="bg-accent" />
+          <BarChart title="Connections (last 30 days)" data={stats.connectionsByDay || []} max={maxConns} color="bg-accent" />
         </div>
 
         {/* Breakdowns */}
