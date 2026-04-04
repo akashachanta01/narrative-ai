@@ -132,7 +132,7 @@ export default function AdminAnalytics() {
 
         {/* Breakdowns */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Breakdown title="Top Pages" data={Object.fromEntries(stats.topPages)} />
+          <Breakdown title="Top Pages" data={Object.fromEntries(stats.topPages || [])} />
           <Breakdown title="Auth Providers" data={stats.providerCounts} />
           <Breakdown title="Connected Sources" data={stats.connProviderCounts} />
         </div>
