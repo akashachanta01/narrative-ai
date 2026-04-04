@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AppNavBar from "@/components/AppNavBar";
-import { Loader2, Users, Plug, TrendingUp, Clock } from "lucide-react";
+import { Loader2, Users, Plug, TrendingUp, Clock, Eye, Globe } from "lucide-react";
 
 interface AdminStats {
   totalUsers: number;
