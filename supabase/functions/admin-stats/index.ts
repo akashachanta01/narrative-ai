@@ -92,6 +92,23 @@ serve(async (req) => {
       connProviderCounts[c.provider] = (connProviderCounts[c.provider] || 0) + 1;
     }
 
+    // Page views by day
+    const pageViewsByDay: Record<string, number> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      pageViewsByDay[d.toISOString().slice(0, 10)] = 0;
+    }
+    for (const pv of (pageViews || [])) {
+      const day = new Date(pv.created_at).toISOString().slice(0, 10);
+      if (pageViewsByDay[day] !== undefined) pageViewsByDay[day]++;
+    }
+
+    // Top pages
+    const pageCounts: Record<string, number> = {};
+    for (const pv of (pageViews || [])) {
+      pageCounts[pv.path] = (pageCounts[pv.path] || 0) + 1;
+    }
+
     // Recent users
     const recentUsers = users
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
