@@ -89,9 +89,10 @@ export default function AdminAnalytics() {
 
   if (!stats) return null;
 
-  const maxSignups = Math.max(...stats.signupsByDay.map((d) => d.count), 1);
-  const maxConns = Math.max(...stats.connectionsByDay.map((d) => d.count), 1);
-  const maxPageViews = Math.max(...stats.pageViewsByDay.map((d) => d.count), 1);
+  const maxSignups = Math.max(...(stats.signupsByDay || []).map((d) => d.count), 1);
+  const maxConns = Math.max(...(stats.connectionsByDay || []).map((d) => d.count), 1);
+  const maxPageViews = Math.max(...(stats.pageViewsByDay || []).map((d) => d.count), 1);
+  const maxUniqueVisitors = Math.max(...(stats.uniqueVisitorsByDay || []).map((d) => d.count), 1);
   const conversionRate = stats.totalUsers > 0
     ? Math.round((stats.usersWithConnections / stats.totalUsers) * 100)
     : 0;
