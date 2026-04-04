@@ -20,6 +20,9 @@ interface AdminStats {
   pageViewsLast7d: number;
   pageViewsByDay: { date: string; count: number }[];
   topPages: [string, number][];
+  uniqueVisitors30d: number;
+  uniqueVisitors7d: number;
+  uniqueVisitorsByDay: { date: string; count: number }[];
 }
 
 export default function AdminAnalytics() {
