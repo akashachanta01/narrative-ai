@@ -16,7 +16,13 @@ import UseCasePage from "./pages/UseCasePage.tsx";
 import MetricPage from "./pages/MetricPage.tsx";
 import ComparisonPage from "./pages/ComparisonPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { usePageTracking } from "@/hooks/usePageTracking";
 const queryClient = new QueryClient();
+
+function PageTracker() {
+  usePageTracking();
+  return null;
+}
 
 const App = () => (
   <HelmetProvider>
@@ -26,6 +32,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <PageTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />

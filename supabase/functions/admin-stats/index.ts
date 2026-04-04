@@ -46,6 +46,12 @@ serve(async (req) => {
     // Get all connections
     const { data: connections } = await adminClient.from("user_connections").select("*");
 
+    // Get page views (last 30 days)
+    const { data: pageViews } = await adminClient
+      .from("page_views")
+      .select("*")
+      .gte("created_at", days30ago.toISOString());
+
     // Build stats
     const now = new Date();
     const days30ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -86,6 +92,23 @@ serve(async (req) => {
       connProviderCounts[c.provider] = (connProviderCounts[c.provider] || 0) + 1;
     }
 
+    // Page views by day
+    const pageViewsByDay: Record<string, number> = {};
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      pageViewsByDay[d.toISOString().slice(0, 10)] = 0;
+    }
+    for (const pv of (pageViews || [])) {
+      const day = new Date(pv.created_at).toISOString().slice(0, 10);
+      if (pageViewsByDay[day] !== undefined) pageViewsByDay[day]++;
+    }
+
+    // Top pages
+    const pageCounts: Record<string, number> = {};
+    for (const pv of (pageViews || [])) {
+      pageCounts[pv.path] = (pageCounts[pv.path] || 0) + 1;
+    }
+
     // Recent users
     const recentUsers = users
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -108,6 +131,10 @@ serve(async (req) => {
       providerCounts,
       connProviderCounts,
       recentUsers,
+      totalPageViews: pageViews?.length || 0,
+      pageViewsLast7d: (pageViews || []).filter((pv) => new Date(pv.created_at) >= days7ago).length,
+      pageViewsByDay: Object.entries(pageViewsByDay).map(([date, count]) => ({ date, count })),
+      topPages: Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10),
     };
 
     return new Response(JSON.stringify(stats), {
